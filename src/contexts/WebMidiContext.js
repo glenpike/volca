@@ -98,10 +98,23 @@ const WebMidiContextProvider = ({ children, manufacturer }) => {
   const addInputListener = (input) => {
     if(input) {
       const listener = WebMidi.getInputById(input.id).addListener("sysex", e => {
-        console.log(`sysex: ${e}`);
+        // console.log(`sysex:`, e);
 				// Validate and remove f0 / f7 head/tail?
 				// Validate manufacturer and remove...?
-        setRxSysexMessage(e)
+				const {data: message } = e
+				const firstByte = message.shift()
+				const lastByte = message.pop()
+				if(firstByte != 0xf0 && lastByte != 0xf2) {
+					console.log('is not a valid Sysex message ', e)
+					return
+				}
+				const manufacturer = message.shift()
+				if(manufacturer != 0x42) {
+					console.log('is not from Korg device ', e)
+					return
+				}
+				console.log('valid sysex message for us ', message)
+        setRxSysexMessage(message)
       });
       _setCurrentListener(listener)
     }

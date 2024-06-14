@@ -48,7 +48,7 @@ const currentSeqDumpRequest = [0x00, 0x01, 0x2F, 0x10]
 | 1111 0111 (F7) | EOX                                              |
 +----------------+--------------------------------------------------+
 */
-const seqDumpRequest = '0x00, 0x01, 0x2F, 0x1C, 0x10'
+const seqDumpRequest = '0x00, 0x01, 0x2F, 0x1C, 0x1s'
 
 const exclusiveHeaderReply = [0x00, 0x01, 0x02F]
 
@@ -65,6 +65,7 @@ const SEQUENCE_DUMP = 'sequence-dump'
 const CURRENT_SEQUENCE_DUMP = 'current-sequence-dump'
 
 const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) => {
+  console.log('injectedWebMidiContext ', injectedWebMidiContext)
   const {
 		lastRxSysexMessage,
     sendSysexMessage,
@@ -84,7 +85,9 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
 	}
 
   useEffect(() => {
-    parseSysexMessage(lastRxSysexMessage)
+    if(lastRxSysexMessage && lastRxSysexMessage.length) {
+      parseSysexMessage(lastRxSysexMessage)
+    }
   }, [lastRxSysexMessage])
 
   const _channelHex = () => {
@@ -116,11 +119,63 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
     }
   }
 
+  function convert7to8bit(inputData) {
+    var convertedData = [];
+    var count = 0;
+    var highBits = 0;
+    for (var i = 0; i < inputData.length; i++) {
+    var pos = i % 8; // relative position in this group of 8 bytes
+    if (!pos) { // first byte
+    highBits = inputData[i];
+    }
+    else {
+    var highBit = highBits & (1 << (pos - 1));
+    highBit <<= (8 - pos); // shift it to the high bit
+    convertedData[count++] = inputData[i] | highBit;
+    }
+    }
+    return convertedData; 
+    }
+
+  const unpackSysEx = (data) => {
+    let result = [];
+    let i = 0;
+
+    while (i < data.length) {
+        // Take the first 8 bytes which are 7-bit data bytes
+        let block = data.slice(i, i + 8);
+        if (block.length < 8) {
+            // If less than 8 bytes left, it means the block is incomplete
+            break;
+        }
+        
+        // The 8th byte is constructed from the MSBs of the first 7 bytes
+        let msbByte = 0;
+        for (let j = 0; j < 7; j++) {
+            msbByte |= ((block[j] & 0x80) >> 7) << j;
+        }
+        
+        // Clear the MSB in the original 7 bytes and add them to the result
+        for (let j = 0; j < 7; j++) {
+            result.push(block[j] & 0x7F);
+        }
+        // Add the constructed 8th byte to the result
+        result.push(msbByte);
+        
+        // Move to the next block of 8 bytes
+        i += 8;
+    }
+    
+    return result;
+  }
+
   const parseSequence = (sequenceBytes) => {
     const sequenceNumber = sequenceBytes.shift()
     console.log('parseSequence ', sequenceNumber & 0xf)
-    _setCurrentSequence(sequenceBytes)
-    _parseSequenceData(sequenceBytes)
+    const data = convert7to8bit(sequenceBytes)
+    // console.log('data unpacked is ', data.length)
+
+    _setCurrentSequence(_parseSequenceData(data))
     setTimeout(() => {
       console.log('currentSequence is now ', currentSequence)
     }, 1000)
@@ -132,14 +187,14 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
     const steps = Array.from({ length: 16 }, () => ({}));
 
     // Check the header
-    const header = String.fromCharCode(data[0], data[1], data[2], data[3], data[4]);
-    if (header !== 'PPTST') {
-        throw new Error(`Invalid header ${header}`);
+    const header = String.fromCharCode(data[0], data[1], data[2], data[3]);
+    if (header !== 'PTST') {
+        throw new Error('Invalid header');
     }
 
     // Parse the step On/Off status
     for (let i = 0; i < 16; i++) {
-        const byteIndex = i < 8 ? 7 : 8;
+        const byteIndex = i < 8 ? 6 : 7;
         const bitIndex = i % 8;
         const stepOnOff = (data[byteIndex] >> bitIndex) & 1;
         steps[i].on = !!stepOnOff;
@@ -147,16 +202,14 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
 
     // Parse the step ACTIVE status
     for (let i = 0; i < 16; i++) {
-        const byteIndex = i < 8 ? 13 : 14;
+        const byteIndex = i < 8 ? 12 : 13;
         const bitIndex = i % 8;
         const stepActive = (data[byteIndex] >> bitIndex) & 1;
         steps[i].active = !!stepActive;
     }
 
     // Parse the number of steps
-    const numberOfSteps = data[16];
-
-    console.log('numberOfSteps ', numberOfSteps)
+    const numberOfSteps = data[15];
 
     // Parse the motion parameters (TRANSPOSE, VELOCITY, etc.)
     const motionParams = [
@@ -167,36 +220,34 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
 
     for (let i = 0; i < motionParams.length; i++) {
         const paramName = motionParams[i];
-        const paramValue = (data[17 + 2 * i] << 8) | data[18 + 2 * i];
+        const paramValue = (data[16 + 2 * i] << 8) | data[17 + 2 * i];
         steps.forEach(step => step[paramName] = paramValue);
     }
 
     // Parse the motion On/Off statuses
     for (let i = 0; i < motionParams.length; i++) {
         const paramName = `motion${motionParams[i][0].toUpperCase() + motionParams[i].slice(1)}On`;
-        const byteIndex = 43 + 2 * i;
+        const byteIndex = 42 + 2 * i;
         const motionOn = data[byteIndex];
         steps.forEach(step => step[paramName] = !!motionOn);
     }
 
     // Parse the step-specific data
     for (let i = 0; i < 16; i++) {
-        const stepDataOffset = 81 + i * 112;
+        const stepDataOffset = 80 + i * 112;
         steps[i].data = Array.from(data.slice(stepDataOffset, stepDataOffset + 112));
     }
 
     // Parse the step MOTION FUNC TRANSPOSE Off/On status
     for (let i = 0; i < 16; i++) {
-        const stepMotionFuncTranspose = (data[1873 + i]) & 1;
+        const stepMotionFuncTranspose = (data[1872 + i]) & 1;
         steps[i].motionFuncTranspose = !!stepMotionFuncTranspose;
     }
 
-    console.log('steps...', steps)
-    console.log('data size', data.length)
     // Check the footer
-    const footer = String.fromCharCode(data[1917], data[1918], data[1919], data[1920], data[1920]);
-    if (footer !== 'PT\x00ED') {
-        throw new Error(`Invalid footer '${footer}'`);
+    const footer = String.fromCharCode(data[1916], data[1917], data[1918], data[1919]);
+    if (footer !== 'PTED') {
+        throw new Error('Invalid footer');
     }
 
     return steps;

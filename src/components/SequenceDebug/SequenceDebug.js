@@ -8,9 +8,6 @@ const SequenceDebug = () => {
 		getSequence,
 	} = useContext(VolcaFMContext)
 
-	// useEffect(() => {
-	// 	getSequence(1)
-	// }, [])
 
   return (
 		<fieldset className="group-control">
@@ -20,7 +17,7 @@ const SequenceDebug = () => {
 					className="message-display__textarea"
 					id="message-display-output"
 					rows="10"
-					defaultValue={bytesToHex(currentSequence)}
+					defaultValue={JSON.stringify(currentSequence)}
 				/>
 				<label className="message-display__label" htmlFor="message-display-output">
 					<strong>Current Sequence</strong>

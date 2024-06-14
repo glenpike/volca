@@ -2,20 +2,24 @@ import React, { useContext, useEffect } from 'react'
 import WebMidiContext from '../../contexts/WebMidiContext.js'
 
 import './MidiSelect.css'
+import VolcaFMContext from '../../contexts/VolcaFMContext.js'
 
 const MidiSelect = () => {
 	const {
 		currentOutput,
     currentInput,
-    currentChannel,
 		midiOutputs,
     midiInputs,
 		setCurrentOutput,
     setCurrentInput,
-    setCurrentChannel,
 		initialise,
     midiInitialised,
 	} = useContext(WebMidiContext)
+  
+  const {
+    currentChannel,
+    setCurrentChannel,
+  } = useContext(VolcaFMContext)
 
 	const selectedOutput = midiOutputs && midiOutputs.indexOf(currentOutput)
   const selectedInput = midiInputs && midiInputs.indexOf(currentInput)
@@ -40,6 +44,7 @@ const MidiSelect = () => {
     setCurrentChannel(event.target.value - 1)
   }
 
+  const channel = currentChannel ? currentChannel+1 : '';
 	return (
     <div className='midi-selects'>
       <div className="midi-select">
@@ -78,7 +83,7 @@ const MidiSelect = () => {
       </div>
       <div className="midi-select">
         <label htmlFor="midi-output-select">Channel</label>{' '}
-        <input type="number" id="midi-channel-select" min="1" max="16" value={currentChannel+1} onChange={handleChannelChange}/>
+        <input type="number" id="midi-channel-select" min="1" max="16" value={channel} onChange={handleChannelChange}/>
       </div>
     </div>
 	)
