@@ -1,24 +1,18 @@
-import logo from './logo.svg';
+import { WebMidiContextProvider } from './contexts/WebMidiContext.js'
+import Wrapper from './Wrapper.js';
+
 import './App.css';
+import { VolcaFMContextProvider } from './contexts/VolcaFMContext.js';
+
+const KORG_MANUFACTURER_ID = 0x42
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <WebMidiContextProvider manufacturer={KORG_MANUFACTURER_ID}>
+      <div className="App">
+        <Wrapper/>
+      </div>
+    </WebMidiContextProvider>
   );
 }
 
