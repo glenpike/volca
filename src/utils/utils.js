@@ -20,10 +20,4 @@ const hexToBytes = (hexStr) => {
 		}, [])
 }
 
-
-// const testReverbValue = (output) => {
-// 	const data = makeSysexData([0x00, 0x28], 0x05)
-// 	sendSysexMessage(output, data)
-// }
-
 export { checkSum, bytesToHex, hexToBytes }

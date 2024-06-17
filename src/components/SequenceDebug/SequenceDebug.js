@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext.js'
-import { bytesToHex } from '../../utils.js'
 
 const SequenceDebug = () => {
 	const {
 		currentSequence,
-		getSequence,
 	} = useContext(VolcaFMContext)
 
 
@@ -13,18 +11,15 @@ const SequenceDebug = () => {
 		<fieldset className="group-control">
 			<legend>Debug</legend>
 			<div className="message-display">
+			<label className="message-display__label" htmlFor="message-display-output">
+					<strong>Current Sequence</strong>
+				</label>
 				<textarea 
 					className="message-display__textarea"
 					id="message-display-output"
 					rows="10"
-					defaultValue={JSON.stringify(currentSequence)}
+					value={JSON.stringify(currentSequence)}
 				/>
-				<label className="message-display__label" htmlFor="message-display-output">
-					<strong>Current Sequence</strong>
-				</label>
-			</div>
-			<div className="get-sequence">
-				<button onClick={() => getSequence(1)}>Get Sequence</button>
 			</div>
     </fieldset>
   )

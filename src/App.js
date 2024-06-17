@@ -1,18 +1,20 @@
-import { WebMidiContextProvider } from './contexts/WebMidiContext.js'
-import Wrapper from './Wrapper.js';
+import { WebMidiContextProvider } from './contexts/WebMidiContext'
+import { TestWebMidiContextProvider } from './contexts/TestWebMidiContext';
+import Wrapper from './Wrapper';
 
 import './App.css';
-import { VolcaFMContextProvider } from './contexts/VolcaFMContext.js';
 
 const KORG_MANUFACTURER_ID = 0x42
 
 function App() {
   return (
-    <WebMidiContextProvider manufacturer={KORG_MANUFACTURER_ID}>
+    <TestWebMidiContextProvider manufacturer={KORG_MANUFACTURER_ID}>
+    {/* <WebMidiContextProvider manufacturer={KORG_MANUFACTURER_ID}> */}
       <div className="App">
         <Wrapper/>
       </div>
-    </WebMidiContextProvider>
+    {/* </WebMidiContextProvider> */}
+    </TestWebMidiContextProvider>
   );
 }
 

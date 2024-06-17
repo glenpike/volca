@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { bytesToHex, hexToBytes } from '../utils'
+import { hexToBytes } from '../utils/utils'
+import Sequence from '../utils/Sequence'
  /*
 +---------+------------------------------------------------+
 | Byte[H] |    Description                                 |
@@ -56,8 +57,10 @@ const exclusiveHeaderReply = [0x00, 0x01, 0x02F]
   initialise: () => {},
   currentChannel: null,
 	setCurrentChannel: () => {},
+	currentSequenceNumber: null,
+  setCurrentSequenceNumber: () => {},
 	currentSequence: null,
-	getSequence: () => {},
+  webMidiContext: null,
 })
 
 const UNKNOWN_MESSAGE = 'unknown-message'
@@ -72,6 +75,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
   } = injectedWebMidiContext;
 
   const [currentChannel, _setCurrentChannel] = useState(channel)
+  const [currentSequenceNumber, _setCurrentSequenceNumber] = useState(1)
   const [currentSequence, _setCurrentSequence] = useState([])
   
   const initialise = () => {
@@ -94,7 +98,9 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
     return 0x30 | currentChannel
   }
 
-  const getSequence = (number) => {
+  const setCurrentSequenceNumber = (number) => {
+    _setCurrentSequenceNumber(number)
+    _setCurrentSequence([])
     const seqNumber = Number(number - 1).toString(16)
     const request = hexToBytes(seqDumpRequest.replace('s', seqNumber))
     sendSysexMessage([_channelHex()].concat(request))
@@ -119,138 +125,12 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
     }
   }
 
-  function convert7to8bit(inputData) {
-    var convertedData = [];
-    var count = 0;
-    var highBits = 0;
-    for (var i = 0; i < inputData.length; i++) {
-    var pos = i % 8; // relative position in this group of 8 bytes
-    if (!pos) { // first byte
-    highBits = inputData[i];
-    }
-    else {
-    var highBit = highBits & (1 << (pos - 1));
-    highBit <<= (8 - pos); // shift it to the high bit
-    convertedData[count++] = inputData[i] | highBit;
-    }
-    }
-    return convertedData; 
-    }
-
-  const unpackSysEx = (data) => {
-    let result = [];
-    let i = 0;
-
-    while (i < data.length) {
-        // Take the first 8 bytes which are 7-bit data bytes
-        let block = data.slice(i, i + 8);
-        if (block.length < 8) {
-            // If less than 8 bytes left, it means the block is incomplete
-            break;
-        }
-        
-        // The 8th byte is constructed from the MSBs of the first 7 bytes
-        let msbByte = 0;
-        for (let j = 0; j < 7; j++) {
-            msbByte |= ((block[j] & 0x80) >> 7) << j;
-        }
-        
-        // Clear the MSB in the original 7 bytes and add them to the result
-        for (let j = 0; j < 7; j++) {
-            result.push(block[j] & 0x7F);
-        }
-        // Add the constructed 8th byte to the result
-        result.push(msbByte);
-        
-        // Move to the next block of 8 bytes
-        i += 8;
-    }
-    
-    return result;
-  }
-
   const parseSequence = (sequenceBytes) => {
-    const sequenceNumber = sequenceBytes.shift()
-    console.log('parseSequence ', sequenceNumber & 0xf)
-    const data = convert7to8bit(sequenceBytes)
-    // console.log('data unpacked is ', data.length)
-
-    _setCurrentSequence(_parseSequenceData(data))
+    const sequence = new Sequence(sequenceBytes)
+    _setCurrentSequence(sequence)
     setTimeout(() => {
       console.log('currentSequence is now ', currentSequence)
     }, 1000)
-  }
-
-  function _parseSequenceData(data) {
-    // console.log('_parseSequenceData ', JSON.stringify(data))
-    // Initialize an array to hold the step objects
-    const steps = Array.from({ length: 16 }, () => ({}));
-
-    // Check the header
-    const header = String.fromCharCode(data[0], data[1], data[2], data[3]);
-    if (header !== 'PTST') {
-        throw new Error('Invalid header');
-    }
-
-    // Parse the step On/Off status
-    for (let i = 0; i < 16; i++) {
-        const byteIndex = i < 8 ? 6 : 7;
-        const bitIndex = i % 8;
-        const stepOnOff = (data[byteIndex] >> bitIndex) & 1;
-        steps[i].on = !!stepOnOff;
-    }
-
-    // Parse the step ACTIVE status
-    for (let i = 0; i < 16; i++) {
-        const byteIndex = i < 8 ? 12 : 13;
-        const bitIndex = i % 8;
-        const stepActive = (data[byteIndex] >> bitIndex) & 1;
-        steps[i].active = !!stepActive;
-    }
-
-    // Parse the number of steps
-    const numberOfSteps = data[15];
-
-    // Parse the motion parameters (TRANSPOSE, VELOCITY, etc.)
-    const motionParams = [
-        'transpose', 'velocity', 'algorithm', 'modulatorAttack', 'modulatorDecay',
-        'carrierAttack', 'carrierDecay', 'lfoRate', 'lfoPitchDepth', 'arpType',
-        'arpDiv', 'chorusDepth', 'reverbDepth'
-    ];
-
-    for (let i = 0; i < motionParams.length; i++) {
-        const paramName = motionParams[i];
-        const paramValue = (data[16 + 2 * i] << 8) | data[17 + 2 * i];
-        steps.forEach(step => step[paramName] = paramValue);
-    }
-
-    // Parse the motion On/Off statuses
-    for (let i = 0; i < motionParams.length; i++) {
-        const paramName = `motion${motionParams[i][0].toUpperCase() + motionParams[i].slice(1)}On`;
-        const byteIndex = 42 + 2 * i;
-        const motionOn = data[byteIndex];
-        steps.forEach(step => step[paramName] = !!motionOn);
-    }
-
-    // Parse the step-specific data
-    for (let i = 0; i < 16; i++) {
-        const stepDataOffset = 80 + i * 112;
-        steps[i].data = Array.from(data.slice(stepDataOffset, stepDataOffset + 112));
-    }
-
-    // Parse the step MOTION FUNC TRANSPOSE Off/On status
-    for (let i = 0; i < 16; i++) {
-        const stepMotionFuncTranspose = (data[1872 + i]) & 1;
-        steps[i].motionFuncTranspose = !!stepMotionFuncTranspose;
-    }
-
-    // Check the footer
-    const footer = String.fromCharCode(data[1916], data[1917], data[1918], data[1919]);
-    if (footer !== 'PTED') {
-        throw new Error('Invalid footer');
-    }
-
-    return steps;
   }
 
   const volcaFMContextValue = {
@@ -258,7 +138,9 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
     currentChannel,
     setCurrentChannel,
     currentSequence,
-	  getSequence,
+    currentSequenceNumber,
+    setCurrentSequenceNumber,
+    webMidiContext: injectedWebMidiContext,
   }
   
   return (

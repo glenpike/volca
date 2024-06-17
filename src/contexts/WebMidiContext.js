@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { WebMidi } from 'webmidi'
-import { bytesToHex, checkSum } from '../utils.js'
+import { bytesToHex } from '../utils/utils.js'
 
 const sysexEnabled = true
 
@@ -105,7 +105,7 @@ const WebMidiContextProvider = ({ children, manufacturer }) => {
 				const firstByte = message.shift()
 				const lastByte = message.pop()
 				if(firstByte != 0xf0 && lastByte != 0xf2) {
-					console.log('is not a valid Sysex message ', e)
+					console.log('is not a valid Sysex message ', firstByte, lastByte)
 					return
 				}
 				const manufacturer = message.shift()
@@ -125,24 +125,6 @@ const WebMidiContextProvider = ({ children, manufacturer }) => {
 			return WebMidi.getInputById(currentInput.id)
 		}
 		return null
-	}
-
-	const makeSysexData = (address, value) => {
-		// const deviceId = 0x10
-		// const modelId = [0x00, 0x0b]
-		// const sendCmd = 0x12
-		// const fullAddress = [0x01, 0x00].concat(address)
-		// const check = checkSum(fullAddress.concat(value))
-		// const data = [].concat(
-		// 	deviceId,
-		// 	modelId,
-		// 	sendCmd,
-		// 	fullAddress,
-		// 	value,
-		// 	check
-		// )
-		// return data
-    return value
 	}
 
 	const sendSysexMessage = (data) => {

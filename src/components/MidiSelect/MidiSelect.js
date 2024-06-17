@@ -1,11 +1,15 @@
 import React, { useContext, useEffect } from 'react'
-import WebMidiContext from '../../contexts/WebMidiContext.js'
-
 import './MidiSelect.css'
 import VolcaFMContext from '../../contexts/VolcaFMContext.js'
 
 const MidiSelect = () => {
-	const {
+  const {
+    currentChannel,
+    setCurrentChannel,
+    webMidiContext,
+  } = useContext(VolcaFMContext)
+
+  const {
 		currentOutput,
     currentInput,
 		midiOutputs,
@@ -14,13 +18,8 @@ const MidiSelect = () => {
     setCurrentInput,
 		initialise,
     midiInitialised,
-	} = useContext(WebMidiContext)
+	} = webMidiContext
   
-  const {
-    currentChannel,
-    setCurrentChannel,
-  } = useContext(VolcaFMContext)
-
 	const selectedOutput = midiOutputs && midiOutputs.indexOf(currentOutput)
   const selectedInput = midiInputs && midiInputs.indexOf(currentInput)
 
