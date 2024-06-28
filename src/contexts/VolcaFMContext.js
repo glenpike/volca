@@ -126,7 +126,8 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
   }
 
   const parseSequence = (sequenceBytes) => {
-    const sequence = new Sequence(sequenceBytes)
+    const sequence = new Sequence()
+    sequence.sysexData = sequenceBytes
     _setCurrentSequence(sequence)
     setTimeout(() => {
       console.log('currentSequence is now ', currentSequence)

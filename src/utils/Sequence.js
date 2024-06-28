@@ -1,4 +1,4 @@
-import { convert7to8bit } from "./MidiUtils";
+import { convert7to8bit, convert8to7bit } from "./MidiUtils";
 
 
 //*note S9
@@ -28,12 +28,22 @@ const MOTION_PARAMS = [
 ];
 
 class Step {
-  constructor(stepData) {
-    this._step = this.parseStep(stepData)
+  fromBytes = (data) => {
+    this.data = this._unpackStep(data)
+    return this
   }
 
-  get step() {
-    return this._step
+  toBytes = () => {
+    const data = this._packStep(this.data)
+    return data
+  }
+
+  get data() {
+    return this._data
+  }
+
+  set data(data) {
+    this._data = data
   }
 
   /*
@@ -85,7 +95,7 @@ class Step {
   | 108~111 |       |         | Reserved                                    |
   +---------+-------+---------+---------------------------------------------+
     */
-  parseStep = (data) => {
+  _unpackStep = (data) => {
     if (data.length < 112) {
         throw new Error('Invalid MIDI step data length. Expected 112 bytes.');
     }
@@ -102,7 +112,7 @@ class Step {
         data[(i * 2) + 1]
       ])
       step.voiceVelocities.push(data[i + 18])
-      step.voiceGateTimes.push(this.parseGateTime(data[24 + i]))
+      step.voiceGateTimes.push(this._unpackGateTime(data[24 + i]))
     }
 
     // Reserved (Bytes 30-31): Typically not used, skipping
@@ -115,14 +125,37 @@ class Step {
         for(let j = 0;j < 5;j++) {
           paramValues.push(data[43 + (i * 5) + j])
         }
-        step.motionData[paramName] = {
-          [paramName]: paramValues
-        }
+        step.motionData[paramName] = paramValues
     }
 
     // Reserved (Bytes 108-111): Typically not used, skipping
 
     return step;
+  }
+
+  _packStep = (step) => {
+    const data = new Array(112).fill(0)
+
+    for(let i = 0;i < 6;i++) {
+      data[i * 2] = step.voiceNoteNumbers[i][0] & 0xFF
+      data[(i * 2) + 1] = step.voiceNoteNumbers[i][1] & 0xFF
+      data[i + 18] = step.voiceVelocities[i]
+      data[24 + i] = this._packGateTime(step.voiceGateTimes[i])
+    }
+    // Reserved (Bytes 30-31): Typically not used, skipping
+
+    // Motion Data (Bytes 43-107)
+    for (let i = 0; i < MOTION_PARAMS.length; i++) {
+        const paramName = MOTION_PARAMS[i];
+        const paramValues = step.motionData[paramName]
+        for(let j = 0;j < 5;j++) {
+          data[43 + (i * 5) + j] = paramValues[j]
+        }
+    }
+
+    // Reserved (Bytes 108-111): Typically not used, skipping
+
+    return data
   }
 
   /*
@@ -136,23 +169,35 @@ class Step {
   If the gate time is set to TIE(127) and the Trigger Switch for the next
   step is set to 0, the sound will continue into the next step.
   */
-  parseGateTime(byte) {
+  _unpackGateTime = (byte) => {
    return {
       timeData: ( byte & 0x7F), 
       gateTime: GATE_TIME_LOOKUP[byte & 0x7F],
       trigger: ( byte & 0x80) !== 0
     }
   }
+
+  _packGateTime = (time) => {
+    return ((time.trigger & 1) << 7) | (GATE_TIME_LOOKUP.indexOf(time.gateTime) & 0x7F)
+  }
 }
 
+
 class Sequence {
-  constructor(sequenceBytes) {
+  set sysexData(sequenceBytes) {
     this._number = sequenceBytes.shift()
-    console.log('parseSequence ', this._number & 0xf)
     const data = convert7to8bit(sequenceBytes)
-    // console.log('data unpacked is ', data.length)
-    this._steps = this._parseSequenceData(data)
-    this._motionData = this._parseMotionData(data)
+    const { steps, motionData } = this._unpackSequenceData(data)
+    this._steps = steps
+    this._motionData = motionData
+  }
+
+  get sysexData() {
+    const sequenceData = this._packSequenceData({ steps: this._steps, motionData: this._motionData })
+    const packedData = convert8to7bit(sequenceData)
+    console.log('sysexData ', packedData)
+
+    return [this._number].concat(packedData)
   }
 
   get number() {
@@ -168,9 +213,7 @@ class Sequence {
     return this._motionData
   }
 
-  _parseSequenceData(data) {
-    // console.log('_parseSequenceData ', JSON.stringify(data))
-    // Check the header
+  _unpackSequenceData(data) {
     const header = String.fromCharCode(data[0], data[1], data[2], data[3]);
     if (header !== 'PTST') {
         throw new Error('Invalid header');
@@ -197,10 +240,21 @@ class Sequence {
         steps[i].active = !!stepActive;
     }
 
+    // Parse the motion parameters (TRANSPOSE, VELOCITY, etc.)
+    // and the motion On/Off statuses
+    const motionData = {}
+    for (let i = 0; i < MOTION_PARAMS.length; i++) {
+      const paramName = MOTION_PARAMS[i];
+      const paramValue = (data[16 + 2 * i] << 8) | data[17 + 2 * i];
+      const byteIndex = 42 + 2 * i;
+      const motionOn = data[byteIndex];
+      motionData[paramName] = { value: paramValue, on: motionOn };
+    }
+
     // Parse the step-specific data
     for (let i = 0; i < numberOfSteps; i++) {
         const stepDataOffset = 80 + i * 112;
-        steps[i].stepData = new Step(Array.from(data.slice(stepDataOffset, stepDataOffset + 112))).step;
+        steps[i].stepData = new Step().fromBytes(Array.from(data.slice(stepDataOffset, stepDataOffset + 112)));
     }
 
     // Parse the step MOTION FUNC TRANSPOSE Off/On status
@@ -215,21 +269,68 @@ class Sequence {
         throw new Error('Invalid footer');
     }
 
-    return steps
+    return { steps, motionData }
   }
 
-  _parseMotionData(data) {
-    // Parse the motion parameters (TRANSPOSE, VELOCITY, etc.)
-    // and the motion On/Off statuses
-    const motionData = {}
-    for (let i = 0; i < MOTION_PARAMS.length; i++) {
-        const paramName = MOTION_PARAMS[i];
-        const paramValue = (data[16 + 2 * i] << 8) | data[17 + 2 * i];
-        const byteIndex = 42 + 2 * i;
-        const motionOn = data[byteIndex];
-        motionData[paramName] = { value: paramValue, on: motionOn };
+  _packSequenceData({ steps, motionData }) {
+    const numberOfSteps = steps.length
+    const data = new Array(1919).fill(0)
+    
+    data[0] = 'P'.charCodeAt(0)
+    data[2] = 'T'.charCodeAt(0)
+    data[3] = 'S'.charCodeAt(0)
+    data[4] = 'T'.charCodeAt(0)
+    data[5] = 232
+    data[6] = 78
+    data[9] = this.number
+    data[15] = numberOfSteps
+
+    // Pack the step On/Off status
+    for (let i = 0; i < numberOfSteps; i++) {
+      const byteIndex = i < 8 ? 6 : 7
+      const bitIndex = i % 8
+      data[byteIndex] |= (steps[i].on & 1) << bitIndex
     }
-    return motionData
+
+    // Pack the step ACTIVE status
+    for (let i = 0; i < numberOfSteps; i++) {
+      const byteIndex = i < 8 ? 12 : 13;
+      const bitIndex = i % 8;
+      data[byteIndex] |= (steps[i].active & 1) << bitIndex
+    }
+
+
+    // Pack the motion param values and on/off
+    for (let i = 0; i < MOTION_PARAMS.length; i++) {
+      const paramName = MOTION_PARAMS[i]
+      const { value: paramValue, on: motionOn } = motionData[paramName]
+      data[16 + i * 2] = (paramValue >> 8) & 0xFF
+      data[17 + i * 2] = paramValue & 0xFF
+      data[42 + 2 * i] = motionOn & 0xFF
+    }
+
+    // Pack the step-specific data
+    for (let i = 0; i < numberOfSteps; i++) {
+        const stepDataOffset = 80 + i * 112;
+        const stepData = Array.from(steps[i].stepData.toBytes())
+        console.log('stepData ', i, ' ', steps[i].stepData, ' = ', stepData)
+        stepData.forEach((value, j) => {
+          data[(80 + i * 112) + j] = value
+        })
+    }
+
+    // Pack the step MOTION FUNC TRANSPOSE Off/On status
+    for (let i = 0; i < numberOfSteps; i++) {
+        data[1872 + i] = steps[i].motionFuncTranspose & 1
+    }
+
+    // Pack the footer
+    data[1916] = 'P'.charCodeAt(0)
+    data[1917] = 'T'.charCodeAt(0)
+    data[1918] = 'E'.charCodeAt(0)
+    data[1919] = 'D'.charCodeAt(0)
+
+    return data
   }
 }
 

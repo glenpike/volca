@@ -1,8 +1,9 @@
 import React, { useContext } from 'react'
 import WebMidiContext from '../../contexts/WebMidiContext.js'
-import { bytesToHex } from '../../utils.js'
+
 
 import './MessageDisplay.css'
+import { bytesToHex } from '../../utils/utils.js'
 
 const MessageDisplay = () => {
 	const {

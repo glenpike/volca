@@ -1,4 +1,5 @@
-// MIDI transmission expands 7 x 8bit bytes into 8 x 7bit bytes with a leading
+import { bytesToHex } from './utils';
+  // MIDI transmission expands 7 x 8bit bytes into 8 x 7bit bytes with a leading
   // 0, so we need to convert this back group by group.
   // Input:
   // MIDI DATA ( 1Set = 7bit x 8Byte )
@@ -31,4 +32,28 @@
     return convertedData; 
   }
 
-  export { convert7to8bit }
+  const convert8to7bit = (inputData) => {
+    const convertedData = [];
+    let output = 0
+    let highByte = 0
+    let nextHighBytePos = 0
+    
+    for (let i = 0; i < inputData.length; i++) {
+      if(i % 7 == 0) {
+        nextHighBytePos = output
+        highByte = 0
+        output++
+      }
+      let byte = inputData[i]
+      highByte = highByte | (byte & 0x80) >> (7 - (i % 7))
+      convertedData[output] = byte & 0x7F;
+      output++
+
+      if(i % 7 == 6 || i + 1 == inputData.length) {
+        convertedData[nextHighBytePos] = highByte
+      }
+    }
+    return convertedData; 
+  }
+
+  export { convert7to8bit, convert8to7bit }

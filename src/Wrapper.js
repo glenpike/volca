@@ -5,6 +5,7 @@ import WebMidiContext from './contexts/WebMidiContext'
 import GetSequence from './components/GetSequence/GetSequence'
 import Sequence from './components/Sequence/Sequence'
 import TestWebMidiContext from './contexts/TestWebMidiContext'
+import SequenceDebug from './components/SequenceDebug/SequenceDebug'
 
 const Wrapper = () => {
   // const webMidi = useContext(WebMidiContext)
@@ -23,7 +24,7 @@ const Wrapper = () => {
         <>
           <GetSequence/>
           <Sequence/>
-          {/* <SequenceDebug/> */}
+          <SequenceDebug/>
         </>
       </div>
       </main>

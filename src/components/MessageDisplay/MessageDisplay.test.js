@@ -22,11 +22,11 @@ describe('MessageDisplay', () => {
 	})
 
 	it('renders a textarea', () => {
-		expect(screen.getByLabelText('Last Sysex Message')).toBeTruthy()
+		expect(screen.getByLabelText('Last Rx Sysex Message')).toBeTruthy()
 	})
 
 	it('renders with no data by default', () => {
-		expect(screen.getByLabelText('Last Sysex Message').value).toEqual('')
+		expect(screen.getByLabelText('Last Rx Sysex Message').value).toEqual('')
 	})
 
 	describe('When midi is not initialised', () => {
@@ -39,7 +39,7 @@ describe('MessageDisplay', () => {
 
 		it('renders with correct data when set', () => {
 			const message = 'f0,aa,01,02,03,04,05,06,f7'
-			expect(screen.getByLabelText('Last Sysex Message').value).toEqual(message)
+			expect(screen.getByLabelText('Last Rx Sysex Message').value).toEqual(message)
 		})
 	})
 })
