@@ -1,4 +1,4 @@
-// import { render } from "../../utils/test-utils"
+import { render, screen } from "../../utils/test-utils"
 import MidiSelect from './MidiSelect'
 
 const input = {
@@ -17,24 +17,45 @@ const inputs = [input]
 const outputs = [output]
 
 const mebWidi = {
-  enable: jest.fn((options) => {
+  enable: (options) => {
     console.log('mockEnable ', options)
     return Promise.resolve(options)
-  }),
+  },
   inputs,
   outputs,
-  getInputById: jest.fn((idToFind) => inputs.find(({ id }) => idToFind === id )),
-  getOutputById: jest.fn((idToFind) => outputs.find(({ id }) => idToFind === id )),
+  getInputById: (idToFind) => inputs.find(({ id }) => idToFind === id ),
+  getOutputById: (idToFind) => outputs.find(({ id }) => idToFind === id ),
 }
 
-test.only('Renders', async () => {
-  console.log('mebWidi.enable ', mebWidi.enable)
-  
-  const value = await mebWidi.enable({ foo: 'bar' })
-  console.log('value ', value)
-  
-  console.log('getInputById 1 ', mebWidi.getInputById('1'))
+describe.only('MidiSelect ', () => {
+  test('WebMidiMocking', async () => {
+    console.log('mebWidi.enable ', mebWidi.enable)
+    const value = await mebWidi.enable({ foo: 'bar' })
+    console.log('value ', value)
+    console.log('getInputById 1 ', mebWidi.getInputById('1'))
+  })
 
-  // const { getByRole, container } = render(<MidiSelect/>, { WebMidi: mebWidi })
-  // container.debug()
+  test('Renders the Midi Input Selector', async () => {
+    render(<MidiSelect/>, { WebMidi: mebWidi })
+    
+    const input = screen.getByRole("combobox", { name: "Input Device"})
+    expect(input).toBeInTheDocument()
+    expect(input).toHaveValue('-1')
+  })
+
+  test('Renders the Midi Output Selector', async () => {
+    render(<MidiSelect/>, { WebMidi: mebWidi })
+    
+    const output = screen.getByRole("combobox", { name: "Output Device"})
+    expect(output).toBeInTheDocument()
+    expect(output).toHaveValue('-1')
+  })
+
+  test('Renders the Midi Channel Selector', async () => {
+    render(<MidiSelect/>, { WebMidi: mebWidi })
+    
+    const output = screen.getByRole("spinbutton", { name: "Channel"})
+    expect(output).toBeInTheDocument()
+    expect(output).toHaveValue(3)
+  })
 })

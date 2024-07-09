@@ -50,6 +50,7 @@ const MidiSelect = () => {
         <label htmlFor="midi-input-select">Input Device</label>{' '}
         <select
           id="midi-input-select"
+          name="midi-input-select"
           value={selectedInput}
           onChange={handleInputChange}
         >
@@ -67,6 +68,7 @@ const MidiSelect = () => {
         <label htmlFor="midi-output-select">Output Device</label>{' '}
         <select
           id="midi-output-select"
+          name="midi-output-select"
           value={selectedOutput}
           onChange={handleOutputChange}
         >
@@ -81,8 +83,8 @@ const MidiSelect = () => {
         </select>
       </div>
       <div className="midi-select">
-        <label htmlFor="midi-output-select">Channel</label>{' '}
-        <input type="number" id="midi-channel-select" min="1" max="16" value={channel} onChange={handleChannelChange}/>
+        <label htmlFor="midi-channel-select">Channel</label>{' '}
+        <input type="number" id="midi-channel-select" name="midi-channel-select" min="1" max="16" value={channel} onChange={handleChannelChange}/>
       </div>
     </div>
 	)
