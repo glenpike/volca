@@ -24,7 +24,7 @@ const mebWidi = {
   getOutputById: (idToFind) => outputs.find(({ id }) => idToFind === id ),
 }
 
-describe.only('MidiSelect ', () => {
+describe('MidiSelect ', () => {
   test.skip('WebMidiMocking', async () => {
     console.log('mebWidi.enable ', mebWidi.enable)
     const value = await mebWidi.enable({ foo: 'bar' })
@@ -52,12 +52,13 @@ describe.only('MidiSelect ', () => {
   })
 
   test('Renders the Midi Channel Selector', async () => {
+    const channel = 4
     await act(async () => {
-      render(<MidiSelect/>, { WebMidi: mebWidi })
+      render(<MidiSelect/>, { WebMidi: mebWidi, channel })
     })
 
     const output = screen.getByRole("spinbutton", { name: "Channel"})
     expect(output).toBeInTheDocument()
-    expect(output).toHaveValue(3)
+    expect(output).toHaveValue(channel)
   })
 })
