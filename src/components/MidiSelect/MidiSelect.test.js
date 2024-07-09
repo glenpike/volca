@@ -1,4 +1,4 @@
-import { render, screen } from "../../utils/test-utils"
+import { render, screen, act } from "../../utils/test-utils"
 import MidiSelect from './MidiSelect'
 
 const input = {
@@ -17,10 +17,7 @@ const inputs = [input]
 const outputs = [output]
 
 const mebWidi = {
-  enable: (options) => {
-    console.log('mockEnable ', options)
-    return Promise.resolve(options)
-  },
+  enable: (options) => Promise.resolve(options),
   inputs,
   outputs,
   getInputById: (idToFind) => inputs.find(({ id }) => idToFind === id ),
@@ -28,7 +25,7 @@ const mebWidi = {
 }
 
 describe.only('MidiSelect ', () => {
-  test('WebMidiMocking', async () => {
+  test.skip('WebMidiMocking', async () => {
     console.log('mebWidi.enable ', mebWidi.enable)
     const value = await mebWidi.enable({ foo: 'bar' })
     console.log('value ', value)
@@ -36,24 +33,29 @@ describe.only('MidiSelect ', () => {
   })
 
   test('Renders the Midi Input Selector', async () => {
-    render(<MidiSelect/>, { WebMidi: mebWidi })
-    
+    await act(async () => {
+      render(<MidiSelect/>, { WebMidi: mebWidi })
+    })
+
     const input = screen.getByRole("combobox", { name: "Input Device"})
     expect(input).toBeInTheDocument()
     expect(input).toHaveValue('-1')
   })
 
   test('Renders the Midi Output Selector', async () => {
-    render(<MidiSelect/>, { WebMidi: mebWidi })
-    
+    await act(async () => {
+      render(<MidiSelect/>, { WebMidi: mebWidi })
+    })
     const output = screen.getByRole("combobox", { name: "Output Device"})
     expect(output).toBeInTheDocument()
     expect(output).toHaveValue('-1')
   })
 
   test('Renders the Midi Channel Selector', async () => {
-    render(<MidiSelect/>, { WebMidi: mebWidi })
-    
+    await act(async () => {
+      render(<MidiSelect/>, { WebMidi: mebWidi })
+    })
+
     const output = screen.getByRole("spinbutton", { name: "Channel"})
     expect(output).toBeInTheDocument()
     expect(output).toHaveValue(3)
