@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { WebMidi } from 'webmidi'
 import { bytesToHex } from '../utils/utils.js'
 
 const sysexEnabled = true
@@ -21,7 +20,7 @@ const WebMidiContext = React.createContext({
 	sendSysexMessage: () => {},
 })
 
-const WebMidiContextProvider = ({ children, manufacturer }) => {
+const WebMidiContextProvider = ({ children, manufacturer, WebMidi }) => {
 	// console.log('WebMidi mocked?')
 	const [currentManufacturer, setManufacturer] = useState(manufacturer || 0x42)
 	const [currentOutput, _setCurrentOutput] = useState(null)

@@ -67,14 +67,14 @@ const UNKNOWN_MESSAGE = 'unknown-message'
 const SEQUENCE_DUMP = 'sequence-dump'
 const CURRENT_SEQUENCE_DUMP = 'current-sequence-dump'
 
-const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) => {
-  console.log('injectedWebMidiContext ', injectedWebMidiContext)
+const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
+  console.log('injectedMidiContext ', injectedMidiContext)
   const {
 		lastRxSysexMessage,
     sendSysexMessage,
-  } = injectedWebMidiContext;
+  } = injectedMidiContext;
 
-  const [currentChannel, _setCurrentChannel] = useState(channel)
+  const [currentChannel, _setCurrentChannel] = useState(channel - 1)
   const [currentSequenceNumber, _setCurrentSequenceNumber] = useState(1)
   const [currentSequence, _setCurrentSequence] = useState([])
   
@@ -141,7 +141,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedWebMidiContext }) =
     currentSequence,
     currentSequenceNumber,
     setCurrentSequenceNumber,
-    webMidiContext: injectedWebMidiContext,
+    webMidiContext: injectedMidiContext,
   }
   
   return (
