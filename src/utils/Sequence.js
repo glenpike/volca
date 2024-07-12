@@ -27,7 +27,7 @@ const MOTION_PARAMS = [
   'arpDiv', 'chorusDepth', 'reverbDepth'
 ];
 
-class Step {
+export class Step {
   fromBytes = (data) => {
     this.data = this._unpackStep(data)
     return this
