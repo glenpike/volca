@@ -68,7 +68,6 @@ const SEQUENCE_DUMP = 'sequence-dump'
 const CURRENT_SEQUENCE_DUMP = 'current-sequence-dump'
 
 const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
-  console.log('injectedMidiContext ', injectedMidiContext)
   const {
 		lastRxSysexMessage,
     sendSysexMessage,
