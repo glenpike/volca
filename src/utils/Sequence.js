@@ -5,9 +5,10 @@ class Sequence {
   set sysexData(sequenceBytes) {
     this._number = sequenceBytes.shift()
     const data = convert7to8bit(sequenceBytes)
-    const { steps, motionData } = this._unpackSequenceData(data)
+    const { steps, motionData, programNumber } = this._unpackSequenceData(data)
     this._steps = steps
     this._motionData = motionData
+    this._programNumber = programNumber
   }
 
   get sysexData() {
@@ -22,6 +23,10 @@ class Sequence {
     return this._number
   }
 
+  get programNumber() {
+    return this._programNumber
+  }
+
   get steps() {
     return this._steps
   }
@@ -31,6 +36,7 @@ class Sequence {
     return this._motionData
   }
 
+  //TODO - reserved bytes!
   _unpackSequenceData(data) {
     const header = String.fromCharCode(data[0], data[1], data[2], data[3]);
     if (header !== 'PTST') {
@@ -49,6 +55,8 @@ class Sequence {
         const stepOnOff = (data[byteIndex] >> bitIndex) & 1;
         steps[i].on = !!stepOnOff;
     }
+
+    const programNumber = data[9]
 
     // Parse the step ACTIVE status
     for (let i = 0; i < numberOfSteps; i++) {
@@ -69,6 +77,24 @@ class Sequence {
       motionData[paramName] = { value: paramValue, on: motionOn };
     }
 
+    const MOTION_SWITCHES = ['onOff', 'smooth', 'warpActiveStep', 'tempo1', 'tempo', 'voiceMono', 'voiceUnison', 'chorus']
+    const motionSwitches = {}
+    const states = data[68]
+    for (let i = 0; i < MOTION_SWITCHES.length; i++) {
+      let switchVal = states & (1 << i) == 1
+      let tempo
+      if(i == 3) {
+        tempo = states & (1 << i) >> 3
+        continue
+      } else if(i == 4) {
+        switchVal = tempo | states & (1 << i) >> 3
+      }
+
+      motionSwitches[MOTION_SWITCHES[i]] = switchVal
+    }
+
+    motionData['switches'] = motionSwitches
+
     // Parse the step-specific data
     for (let i = 0; i < numberOfSteps; i++) {
         const stepDataOffset = 80 + i * 112;
@@ -87,10 +113,11 @@ class Sequence {
         throw new Error('Invalid footer');
     }
 
-    return { steps, motionData }
+    return { steps, motionData, programNumber }
   }
 
-  _packSequenceData({ steps, motionData }) {
+  //TODO - reserved bytes!
+  _packSequenceData({ steps, motionData, programNumber }) {
     const numberOfSteps = steps.length
     const data = new Array(1919).fill(0)
     
@@ -100,7 +127,7 @@ class Sequence {
     data[4] = 'T'.charCodeAt(0)
     data[5] = 232
     data[6] = 78
-    data[9] = this.number
+    data[9] = programNumber
     data[15] = numberOfSteps
 
     // Pack the step On/Off status
