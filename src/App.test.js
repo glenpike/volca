@@ -36,11 +36,13 @@ jest.mock('webmidi', () => {
   }
 })
 
-test.only('renders learn react link', async () => {
-  await act(async () => {
-    render(<App />)
-  })
+describe('App', () => {
+  test('renders ok', async () => {
+    await act(async () => {
+      render(<App />)
+    })
 
-  const title = screen.getByText(/Korg Volca FM2 Sequences/i);
-  expect(title).toBeInTheDocument();
-});
+    const title = screen.getByText(/Korg Volca FM2 Sequences/i)
+    expect(title).toBeInTheDocument()
+  })
+})

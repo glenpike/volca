@@ -1,4 +1,4 @@
-import { render, screen, act } from "../../utils/test-utils"
+import { webmidiRender, screen, act } from "../../utils/test-utils"
 import MidiSelect from './MidiSelect'
 
 const input = {
@@ -34,7 +34,7 @@ describe('MidiSelect ', () => {
 
   test('Renders the Midi Input Selector', async () => {
     await act(async () => {
-      render(<MidiSelect/>, { WebMidi: mebWidi })
+      webmidiRender(<MidiSelect/>, { WebMidi: mebWidi })
     })
 
     const input = screen.getByRole("combobox", { name: "Input Device"})
@@ -44,7 +44,7 @@ describe('MidiSelect ', () => {
 
   test('Renders the Midi Output Selector', async () => {
     await act(async () => {
-      render(<MidiSelect/>, { WebMidi: mebWidi })
+      webmidiRender(<MidiSelect/>, { WebMidi: mebWidi })
     })
     const output = screen.getByRole("combobox", { name: "Output Device"})
     expect(output).toBeInTheDocument()
@@ -54,7 +54,7 @@ describe('MidiSelect ', () => {
   test('Renders the Midi Channel Selector', async () => {
     const channel = 4
     await act(async () => {
-      render(<MidiSelect/>, { WebMidi: mebWidi, channel })
+      webmidiRender(<MidiSelect/>, { WebMidi: mebWidi, channel })
     })
 
     const output = screen.getByRole("spinbutton", { name: "Channel"})
