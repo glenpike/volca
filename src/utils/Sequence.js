@@ -5,10 +5,11 @@ class Sequence {
   set sysexData(sequenceBytes) {
     this._number = sequenceBytes.shift()
     const data = convert7to8bit(sequenceBytes)
-    const { steps, motionData, programNumber } = this._unpackSequenceData(data)
+    const { steps, motionData, programNumber, reserved } = this._unpackSequenceData(data)
     this._steps = steps
     this._motionData = motionData
     this._programNumber = programNumber
+    this._reserved = reserved
   }
 
   get sysexData() {
@@ -43,6 +44,8 @@ class Sequence {
         throw new Error('Invalid header');
     }
 
+    const reserved4 = [data[4], data[5]]
+
     // Parse the number of steps
     const numberOfSteps = data[15];
     // Initialize an array to hold the step objects
@@ -56,7 +59,11 @@ class Sequence {
         steps[i].on = !!stepOnOff;
     }
 
+    const reserved8 = data[8]
+
     const programNumber = data[9]
+
+    const reserved10 = [data[10], data[11]]
 
     // Parse the step ACTIVE status
     for (let i = 0; i < numberOfSteps; i++) {
@@ -65,6 +72,8 @@ class Sequence {
         const stepActive = (data[byteIndex] >> bitIndex) & 1;
         steps[i].active = !!stepActive;
     }
+
+    const reserved14 = data[14]
 
     // Parse the motion parameters (TRANSPOSE, VELOCITY, etc.)
     // and the motion On/Off statuses
@@ -95,6 +104,12 @@ class Sequence {
 
     motionData['switches'] = motionSwitches
 
+    // Reserved (Bytes 74-79): Typically not used
+    const reserved74 = []
+    for (let i = 0;i < 6;i++) {
+      reserved74[i] = data[i + 74]
+    }
+
     // Parse the step-specific data
     for (let i = 0; i < numberOfSteps; i++) {
         const stepDataOffset = 80 + i * 112;
@@ -107,13 +122,29 @@ class Sequence {
         steps[i].motionFuncTranspose = !!stepMotionFuncTranspose;
     }
 
+    
+    // Reserved (Bytes 1888-1915): Typically not used
+    const reserved1888 = []
+    for (let i = 0;i < 27;i++) {
+      reserved1888[i] = data[i + 1888]
+    }
+
     // Check the footer
     const footer = String.fromCharCode(data[1916], data[1917], data[1918], data[1919]);
     if (footer !== 'PTED') {
         throw new Error('Invalid footer');
     }
+    
+    const reserved = {
+      reserved4,
+      reserved8,
+      reserved10,
+      reserved14,
+      reserved74,
+      reserved1888
+    }
 
-    return { steps, motionData, programNumber }
+    return { steps, motionData, programNumber, reserved }
   }
 
   //TODO - reserved bytes!

@@ -1,0 +1,14 @@
+.step {
+
+}
+
+.step-notes {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  list-style-type: none;
+}
+
+.step-note {
+
+}
