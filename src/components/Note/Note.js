@@ -1,19 +1,22 @@
 import React from 'react';
-import { musicalNoteName, musicalOctave } from '../../utils/MidiNotes';
+import { noteNumberToName, noteNumberToOctave, musicalNotes } from '../../utils/MidiNotes';
+import './Note.css';
 
-const Note = ({ number, velocity, gateTime, trigger, motionData }) => {
+const Note = ({ on, number, velocity, gateTime, trigger, motionData }) => {
+  const disabled = !(on && trigger);
+
+  const noteOptions = ['-', ...musicalNotes]
   return (
-    <div>
-      <label>
-        Trigger:
-        <input
-          type="checkbox"
-          checked={trigger}
-          onChange={(e) => console.log("Trigger: ", e.target.checked)}
-        />
-      </label>
-      <select aria-label="Note" defaultValue={musicalNoteName(number)} disabled={!trigger}>
-        {['-', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].map((note, index) => (
+    <div className="note">
+      <input
+        aria-label="Trigger Note"
+        type="checkbox"
+        checked={trigger}
+        onChange={(e) => console.log("Trigger: ", e.target.checked)}
+        disabled={!on}
+      />
+      <select aria-label="Note" defaultValue={noteNumberToName(number)} disabled={disabled}>
+        {noteOptions.map((note, index) => (
           <option key={index} value={note}>
             {note}
           </option>
@@ -23,13 +26,13 @@ const Note = ({ number, velocity, gateTime, trigger, motionData }) => {
         type="number"
         min="-1"
         max="8"
-        defaultValue={musicalOctave(number)}
+        defaultValue={noteNumberToOctave(number)}
         aria-label="Octave"
-        disabled={!trigger}
+        disabled={disabled}
       />
-      <input type="number" min="0" max="127" defaultValue={velocity} aria-label="Velocity" disabled={!trigger}/>
-      <input type="number" min="0" max="100" defaultValue={gateTime} aria-label="Gate Time" disabled={!trigger}/>
-      {/* <p>Motion Data: {JSON.stringify(motionData)}</p> */}
+      <input type="number" min="0" max="127" defaultValue={velocity} aria-label="Velocity" disabled={disabled}/>
+      <input type="number" min="0" max="100" defaultValue={gateTime} aria-label="Gate Time" disabled={disabled}/>
+      <p className="noteMotionData">Motion Data: {JSON.stringify(motionData)}</p>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import { convert7to8bit, convert8to7bit } from "./MidiUtils"
-import SequenceStep, { MOTION_PARAMS } from "./SequenceStep"
+import VolcaStep, { MOTION_PARAMS } from "./VolcaStep"
 
-class Sequence {
+class VolcaSequence {
   set sysexData(sequenceBytes) {
     this._number = sequenceBytes.shift()
     const data = convert7to8bit(sequenceBytes)
@@ -13,7 +13,7 @@ class Sequence {
   }
 
   get sysexData() {
-    const sequenceData = this._packSequenceData({ steps: this._steps, motionData: this._motionData })
+    const sequenceData = this._packSequenceData({ steps: this._steps, motionData: this._motionData, reserved: this._reserved })
     const packedData = convert8to7bit(sequenceData)
     console.log('sysexData ', packedData)
 
@@ -24,27 +24,49 @@ class Sequence {
     return this._number
   }
 
+  set number(number) {
+    this._number = number
+  }
+
   get programNumber() {
     return this._programNumber
+  }
+
+  set programNumber(programNumber) {
+    this._programNumber = programNumber
   }
 
   get steps() {
     return this._steps
   }
 
+  set steps(steps) {
+    this._steps = steps
+  }
 
   get motionData() {
     return this._motionData
   }
 
-  //TODO - reserved bytes!
+  set motionData(motionData) {
+    this._motionData = motionData
+  }
+
+  get reserved() {
+    return this._reserved
+  }
+
+  set reserved(reserved) {  
+    this._reserved = reserved
+  }
+
   _unpackSequenceData(data) {
     const header = String.fromCharCode(data[0], data[1], data[2], data[3]);
     if (header !== 'PTST') {
         throw new Error('Invalid header');
     }
 
-    const reserved4 = [data[4], data[5]]
+    const reserved4_5 = [data[4], data[5]]
 
     // Parse the number of steps
     const numberOfSteps = data[15];
@@ -63,7 +85,7 @@ class Sequence {
 
     const programNumber = data[9]
 
-    const reserved10 = [data[10], data[11]]
+    const reserved10_11 = [data[10], data[11]]
 
     // Parse the step ACTIVE status
     for (let i = 0; i < numberOfSteps; i++) {
@@ -105,15 +127,15 @@ class Sequence {
     motionData['switches'] = motionSwitches
 
     // Reserved (Bytes 74-79): Typically not used
-    const reserved74 = []
+    const reserved74_79 = []
     for (let i = 0;i < 6;i++) {
-      reserved74[i] = data[i + 74]
+      reserved74_79[i] = data[i + 74]
     }
 
     // Parse the step-specific data
     for (let i = 0; i < numberOfSteps; i++) {
         const stepDataOffset = 80 + i * 112;
-        steps[i].stepData = new SequenceStep().fromBytes(Array.from(data.slice(stepDataOffset, stepDataOffset + 112)));
+        steps[i].stepData = new VolcaStep().fromBytes(Array.from(data.slice(stepDataOffset, stepDataOffset + 112)));
     }
 
     // Parse the step MOTION FUNC TRANSPOSE Off/On status
@@ -122,11 +144,10 @@ class Sequence {
         steps[i].motionFuncTranspose = !!stepMotionFuncTranspose;
     }
 
-    
     // Reserved (Bytes 1888-1915): Typically not used
-    const reserved1888 = []
+    const reserved1888_1915 = []
     for (let i = 0;i < 27;i++) {
-      reserved1888[i] = data[i + 1888]
+      reserved1888_1915[i] = data[i + 1888]
     }
 
     // Check the footer
@@ -136,31 +157,38 @@ class Sequence {
     }
     
     const reserved = {
-      reserved4,
+      reserved4_5,
       reserved8,
-      reserved10,
+      reserved10_11,
       reserved14,
-      reserved74,
-      reserved1888
+      reserved74_79,
+      reserved1888_1915
     }
 
     return { steps, motionData, programNumber, reserved }
   }
 
   //TODO - reserved bytes!
-  _packSequenceData({ steps, motionData, programNumber }) {
+  _packSequenceData({ steps, motionData, programNumber, reserved }) {
     const numberOfSteps = steps.length
     const data = new Array(1919).fill(0)
     
-    data[0] = 'P'.charCodeAt(0)
-    data[2] = 'T'.charCodeAt(0)
-    data[3] = 'S'.charCodeAt(0)
-    data[4] = 'T'.charCodeAt(0)
-    data[5] = 232
-    data[6] = 78
-    data[9] = programNumber
-    data[15] = numberOfSteps
+    const {
+      reserved4_5,
+      reserved8,
+      reserved10_11,
+      reserved14,
+      reserved74_79,
+      reserved1888_1915
+    } = reserved
 
+    data[0] = 'P'.charCodeAt(0)
+    data[1] = 'T'.charCodeAt(0)
+    data[2] = 'S'.charCodeAt(0)
+    data[3] = 'T'.charCodeAt(0)
+    data[4] = reserved4_5[0]
+    data[5] = reserved4_5[1]
+    
     // Pack the step On/Off status
     for (let i = 0; i < numberOfSteps; i++) {
       const byteIndex = i < 8 ? 6 : 7
@@ -168,6 +196,11 @@ class Sequence {
       data[byteIndex] |= (steps[i].on & 1) << bitIndex
     }
 
+    data[8] = reserved8
+    data[9] = programNumber
+    data[10] = reserved10_11[0]
+    data[11] = reserved10_11[1]
+    
     // Pack the step ACTIVE status
     for (let i = 0; i < numberOfSteps; i++) {
       const byteIndex = i < 8 ? 12 : 13;
@@ -175,6 +208,8 @@ class Sequence {
       data[byteIndex] |= (steps[i].active & 1) << bitIndex
     }
 
+    data[14] = reserved14
+    data[15] = numberOfSteps
 
     // Pack the motion param values and on/off
     for (let i = 0; i < MOTION_PARAMS.length; i++) {
@@ -183,6 +218,10 @@ class Sequence {
       data[16 + i * 2] = (paramValue >> 8) & 0xFF
       data[17 + i * 2] = paramValue & 0xFF
       data[42 + 2 * i] = motionOn & 0xFF
+    }
+
+    for (let i = 0;i < 6;i++) {
+      data[i + 74] = reserved74_79[i]
     }
 
     // Pack the step-specific data
@@ -200,6 +239,10 @@ class Sequence {
         data[1872 + i] = steps[i].motionFuncTranspose & 1
     }
 
+    for (let i = 0;i < 27;i++) {
+      data[i + 1888] = reserved1888_1915[i]
+    }
+
     // Pack the footer
     data[1916] = 'P'.charCodeAt(0)
     data[1917] = 'T'.charCodeAt(0)
@@ -210,4 +253,4 @@ class Sequence {
   }
 }
 
-export default Sequence
+export default VolcaSequence

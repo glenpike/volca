@@ -9,8 +9,9 @@ const Step = ({ stepNumber, stepData }) => {
   const notes = noteData.voiceNoteNumbers.map((note, index) => {
     const { gateTime, trigger } = noteData.voiceGateTimes[index]
     return (
-      <li className="step-note">
-        <Note key={index}
+      <li className="step-note" key={index}>
+        <Note
+          on={on}
           number={note[0]}
           velocity={noteData.voiceVelocities[index]}
           gateTime={gateTime}
@@ -23,8 +24,14 @@ const Step = ({ stepNumber, stepData }) => {
   return (
     <span key={stepNumber} className="step">
       <p><strong>{stepNumber + 1}</strong></p>
-      <p>On: {on ? 'Yes' : 'No'}</p>
-      <p>Active: {active ? 'Yes' : 'No'}</p>
+      <label>
+        Step On:
+        <input type="checkbox" checked={on} readOnly />
+      </label>
+      {/* <label>
+        Active:
+        <input type="checkbox" checked={active} readOnly />
+      </label> */}
       <ul className="step-notes">
         {notes}
       </ul>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { hexToBytes } from '../utils/utils'
-import Sequence from '../utils/Sequence'
+import VolcaSequence from '../utils/VolcaSequence'
  /*
 +---------+------------------------------------------------+
 | Byte[H] |    Description                                 |
@@ -125,7 +125,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   }
 
   const parseSequence = (sequenceBytes) => {
-    const sequence = new Sequence()
+    const sequence = new VolcaSequence()
     sequence.sysexData = sequenceBytes
     _setCurrentSequence(sequence)
     setTimeout(() => {

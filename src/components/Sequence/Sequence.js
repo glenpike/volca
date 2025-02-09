@@ -1,8 +1,6 @@
 import React, { useContext } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
-
 import Step from '../Step/Step'
-
 import './Sequence.css';
 
 const Sequence = () => {
@@ -28,7 +26,7 @@ const Sequence = () => {
   }
 
   const steps = currentSequence.steps.map((step, index) =>
-    <li className="sequence-step"><Step key={index} stepNumber={index} stepData={step}/></li>
+    <li className="sequence-step" key={index}><Step stepNumber={index} stepData={step}/></li>
   )
 
   return (

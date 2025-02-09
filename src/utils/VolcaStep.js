@@ -24,7 +24,7 @@ export const MOTION_PARAMS = [
   'arpDiv', 'chorusDepth', 'reverbDepth'
 ];
 
-class SequenceStep {
+class VolcaStep {
   fromBytes = (data) => {
     this.data = this._unpackStep(data)
     return this
@@ -193,4 +193,4 @@ class SequenceStep {
   }
 }
 
-export default SequenceStep
+export default VolcaStep
