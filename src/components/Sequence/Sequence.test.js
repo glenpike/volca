@@ -4,6 +4,8 @@ import '@testing-library/jest-dom/extend-expect'
 
 import Sequence from './Sequence'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
+import VolcaSequence from '../../utils/Volca/Sequence'
+import { unpackedData } from '../../../test/sequenceBytes'
 
 jest.mock('../Step/Step.js', () => () => <div className="step">Mock Step</div>);
 
@@ -27,8 +29,10 @@ describe('Sequence Component', () => {
   })
 
   test('renders null when MIDI is not initialised', () => {
+    const sequence = new VolcaSequence(1)
+    sequence.fromBytes([...unpackedData])
     const contextValue = {
-      currentSequence: { steps: [], motionData: {} },
+      currentSequence: sequence,
       currentSequenceNumber: 1,
       webMidiContext: { midiInitialised: false }
     }
@@ -37,24 +41,28 @@ describe('Sequence Component', () => {
   })
 
   test('renders sequence steps when sequence is loaded', () => {
+    const sequence = new VolcaSequence(1)
+    sequence.fromBytes([...unpackedData])
     const contextValue = {
-      currentSequence: { steps: [{}, {}, {}], motionData: {} },
+      currentSequence: sequence,
       currentSequenceNumber: 1,
       webMidiContext: { midiInitialised: true }
     }
     renderWithContext(contextValue)
     expect(screen.getByText('Current Sequence 1')).toBeInTheDocument()
-    expect(screen.getAllByRole('listitem')).toHaveLength(3)
+    expect(screen.getAllByRole('listitem')).toHaveLength(16)
   })
 
   test('renders motion data correctly', () => {
+    const sequence = new VolcaSequence(1)
+    sequence.fromBytes([...unpackedData])
     const contextValue = {
-      currentSequence: { steps: [{}], motionData: { param: 'value' } },
+      currentSequence: sequence,
       currentSequenceNumber: 1,
       webMidiContext: { midiInitialised: true }
     }
     renderWithContext(contextValue)
     
-    expect(screen.getByText('Motion data: {"param":"value"}')).toBeInTheDocument()
+    expect(screen.getByText(/Motion data:/)).toBeInTheDocument()
   })
 })

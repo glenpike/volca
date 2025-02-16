@@ -1,4 +1,10 @@
-import midiNotes, { musicalNotes, noteNumberToOctave, noteNumberToName, midiToNote, noteToMidi } from './MidiNotes';
+import midiNotes, { 
+  musicalNotes,
+  noteNumberToOctave,
+  noteNumberToName,
+  midiToNote,
+  noteToMidi
+} from './MidiNotes';
 
 describe('MidiNotes Utilities', () => {
   test('midiNotes array should have 128 elements', () => {

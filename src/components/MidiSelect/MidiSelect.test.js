@@ -1,4 +1,5 @@
-import { webmidiRender, screen, act } from "../../utils/test-utils"
+import { screen, act } from '@testing-library/react'
+import { webmidiRender } from '../../../test/TestWrappers'
 import MidiSelect from './MidiSelect'
 
 const input = {

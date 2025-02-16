@@ -4,7 +4,8 @@ import './Step.css';
 
 
 const Step = ({ stepNumber, stepData }) => {
-  const { on, active, stepData: { _data: noteData } } = stepData
+  const on = stepData.on
+  const noteData = stepData.data
 
   const notes = noteData.voiceNoteNumbers.map((note, index) => {
     const { gateTime, trigger } = noteData.voiceGateTimes[index]
@@ -35,7 +36,7 @@ const Step = ({ stepNumber, stepData }) => {
       <ul className="step-notes">
         {notes}
       </ul>
-      {/* <p>noteData {JSON.stringify(noteData)}</p> */}
+      {/* <p>step {stepData.toJSON()}</p> */}
     </span>
   )
 }

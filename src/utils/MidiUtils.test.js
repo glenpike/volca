@@ -1,4 +1,3 @@
-// import { render, screen } from '@testing-library/react';
 import { convert7to8bit, convert8to7bit } from './MidiUtils';
 import { bytesToHex } from './utils';
 
@@ -23,6 +22,5 @@ test('converts to 8 byte Midi data correctly', () => {
 test('converts to 8 byte Midi data correctly with irregular data', () => {
   let toConvert = [0xC4, 0xE6, 0x91, 0x33, 0xD5, 0x80, 0xFF, 0xC4, 0xE6, 0x91, 0x33, 0xD5]
   let converted = convert8to7bit(toConvert)
-  console.log(bytesToHex(converted))
   expect(converted).toEqual([0x77, 0x44, 0x66, 0x11, 0x33, 0x55, 0x00, 0x7F, 0x17, 0x44, 0x66, 0x11, 0x33, 0x55])
 });

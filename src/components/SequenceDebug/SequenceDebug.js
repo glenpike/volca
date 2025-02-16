@@ -8,9 +8,13 @@ const SequenceDebug = () => {
 	} = useContext(VolcaFMContext)
 
 	const [currentDump, setCurrentDump] = useState('')
-	const handleGetSequence = () => {
+	const handleDumpSysex = () => {
 		
-		setCurrentDump(bytesToHex(currentSequence.sysexData))
+		setCurrentDump(bytesToHex(currentSequence.toBytes()))
+	}
+
+	const handleDumpJSON = () => {
+		setCurrentDump(JSON.stringify(currentSequence))
 	}
 
 	if(!currentSequence || !currentSequence?.steps?.length) {
@@ -34,7 +38,8 @@ const SequenceDebug = () => {
 				/> */}
 				<p>{JSON.stringify(currentDump)}</p>
 			</div>
-			<button onClick={handleGetSequence}>Dump</button>
+			<button onClick={handleDumpSysex}>Dump Sysex</button>
+			<button onClick={handleDumpJSON}>Dump JSON</button>
     </fieldset>
   )
 }

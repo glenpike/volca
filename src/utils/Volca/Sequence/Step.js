@@ -1,3 +1,4 @@
+import { MOTION_PARAMS } from "./Motion"
 //*note S9
 const GATE_TIME_LOOKUP = [
   "0", "1", "3", "4", "6", "7", "8", "10",
@@ -18,21 +19,45 @@ const GATE_TIME_LOOKUP = [
   "100", "100", "100", "100", "100", "100", "100", "127"
 ]
 
-export const MOTION_PARAMS = [
-  'transpose', 'velocity', 'algorithm', 'modulatorAttack', 'modulatorDecay',
-  'carrierAttack', 'carrierDecay', 'lfoRate', 'lfoPitchDepth', 'arpType',
-  'arpDiv', 'chorusDepth', 'reverbDepth'
-];
+class Step {
+  constructor({ on = false, active = false, motionFuncTranspose = false } = {}) {
+    this._on = on
+    this._active = active
+    this._motionFuncTranspose = motionFuncTranspose
+  }
 
-class VolcaStep {
   fromBytes = (data) => {
-    this.data = this._unpackStep(data)
+    this._unpackStep(data)
     return this
   }
 
   toBytes = () => {
-    const data = this._packStep(this.data)
-    return data
+    return this._packStep()
+  }
+
+  toJSON = () => {  
+    return JSON.stringify({ 
+      on: this._on,
+      active: this._active,
+      motionFuncTranspose: this._motionFuncTranspose,
+      data: this._data
+    })
+  }
+
+  get on() {
+    return this._on
+  }
+
+  set on(on) {
+    this._on = on
+  }    
+
+  get active() {
+    return this._active
+  }
+
+  set active(active) {
+    this._active = active
   }
 
   get data() {
@@ -41,6 +66,14 @@ class VolcaStep {
 
   set data(data) {
     this._data = data
+  }
+
+  get motionFuncTranspose() {
+    return this._motionFuncTranspose
+  }
+
+  set motionFuncTranspose(motionFuncTranspose) {
+    this._motionFuncTranspose = motionFuncTranspose
   }
 
   /*
@@ -98,64 +131,64 @@ class VolcaStep {
     }
 
     // Initialize an object to store parsed values
-    let step = {};
+    this._data = {};
 
-    step.voiceNoteNumbers = []
-    step.voiceVelocities = []
-    step.voiceGateTimes = []
+    this._data.voiceNoteNumbers = []
+    this._data.voiceVelocities = []
+    this._data.voiceGateTimes = []
     for(let i = 0;i < 6;i++) {
-      step.voiceNoteNumbers.push([
+      this._data.voiceNoteNumbers.push([
         data[i * 2],
         data[(i * 2) + 1]
       ])
-      step.voiceVelocities.push(data[i + 18])
-      step.voiceGateTimes.push(this._unpackGateTime(data[24 + i]))
+      this._data.voiceVelocities.push(data[i + 18])
+      this._data.voiceGateTimes.push(this._unpackGateTime(data[24 + i]))
     }
 
     // Reserved (Bytes 30-42): Typically not used
-    step.reserved30 = []
+    this._data.reserved30 = []
     for (let i = 0;i < 12;i++) {
-      step.reserved30[i] = data[i + 30]
+      this._data.reserved30[i] = data[i + 30]
     }
 
     // Motion Data (Bytes 43-107)
-    step.motionData = {}
+    this._data.motionData = {}
     for (let i = 0; i < MOTION_PARAMS.length; i++) {
         const paramName = MOTION_PARAMS[i];
         const paramValues = [];
         for(let j = 0;j < 5;j++) {
           paramValues.push(data[43 + (i * 5) + j])
         }
-        step.motionData[paramName] = paramValues
+        this._data.motionData[paramName] = paramValues
     }
 
     // Reserved (Bytes 108-111): Typically not used, skipping
-    step.reserved108 = []
+    this._data.reserved108 = []
     for (let i = 0;i < 4;i++) {
-      step.reserved108[i] = data[i + 108]
+      this._data.reserved108[i] = data[i + 108]
     }
 
-    return step;
+    return this._data;
   }
 
-  _packStep = (step) => {
+  _packStep = () => {
     const data = new Array(112).fill(0)
 
     for(let i = 0;i < 6;i++) {
-      data[i * 2] = step.voiceNoteNumbers[i][0] & 0xFF
-      data[(i * 2) + 1] = step.voiceNoteNumbers[i][1] & 0xFF
-      data[i + 18] = step.voiceVelocities[i]
-      data[24 + i] = this._packGateTime(step.voiceGateTimes[i])
+      data[i * 2] = this._data.voiceNoteNumbers[i][0] & 0xFF
+      data[(i * 2) + 1] = this._data.voiceNoteNumbers[i][1] & 0xFF
+      data[i + 18] = this._data.voiceVelocities[i]
+      data[24 + i] = this._packGateTime(this._data.voiceGateTimes[i])
     }
     // Reserved (Bytes 30-31): Typically not used
     for (let i = 0;i < 12;i++) {
-      data[i + 30] = step.reserved30[i]
+      data[i + 30] = this._data.reserved30[i]
     }
 
     // Motion Data (Bytes 43-107)
     for (let i = 0; i < MOTION_PARAMS.length; i++) {
         const paramName = MOTION_PARAMS[i];
-        const paramValues = step.motionData[paramName]
+        const paramValues = this._data.motionData[paramName]
         for(let j = 0;j < 5;j++) {
           data[43 + (i * 5) + j] = paramValues[j]
         }
@@ -163,7 +196,7 @@ class VolcaStep {
 
     // Reserved (Bytes 108-111): Typically not used
     for (let i = 0;i < 4;i++) {
-      data[i + 108] = step.reserved108[i]
+      data[i + 108] = this._data.reserved108[i]
     }
   
     return data
@@ -193,4 +226,4 @@ class VolcaStep {
   }
 }
 
-export default VolcaStep
+export default Step

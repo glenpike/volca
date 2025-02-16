@@ -32,10 +32,11 @@ const Sequence = () => {
   return (
     <div className='sequence'>
       <h2>Current Sequence {currentSequenceNumber}</h2>
-      <p>Motion data: {JSON.stringify(currentSequence.motionData)}</p>
       <ul className="sequence-steps">
         {steps}
       </ul>
+      <p>Motion data: {currentSequence.motionData.toJSON()}</p>
+      <p>Settings: {currentSequence.sequenceSettings.toJSON()}</p>
     </div>
   )
 }

@@ -1,22 +1,23 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import Step from './Step';
+import VolcaStep from '../../utils/Volca/Sequence/Step';
 
 jest.mock('../Note/Note.js', () => () => <div className="mock-note">Mock Note</div>);
 
 describe('Step Component', () => {
-  const mockStepData = {
+  const mockStepData = new VolcaStep({
     on: true,
-    active: true,
-    stepData: {
-      _data: {
+    active: true
+  })
+  beforeEach(() => {
+    mockStepData.data = {
         voiceNoteNumbers: [[60], [62], [64]],
         voiceGateTimes: [{ gateTime: 0.5, trigger: true }, { gateTime: 0.5, trigger: true }, { gateTime: 0.5, trigger: true }],
         voiceVelocities: [100, 100, 100],
         motionData: {}
       }
-    }
-  };
+  })
 
   it('renders without crashing', () => {
     const { container } = render(<Step stepNumber={0} stepData={mockStepData} />);

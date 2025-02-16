@@ -1,4 +1,3 @@
-import { bytesToHex } from './utils';
   // MIDI transmission expands 7 x 8bit bytes into 8 x 7bit bytes with a leading
   // 0, so we need to convert this back group by group.
   // Input:

@@ -2,7 +2,7 @@ import { act, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event'
 
 import GetSequence from "./GetSequence"
-import { volcaRender } from '../../utils/test-utils';
+import { volcaRender } from '../../../test/TestWrappers';
 
 //We can't quite mock the VolcaFMContext, which would be nicer perhaps?
 const webMidiContext = {

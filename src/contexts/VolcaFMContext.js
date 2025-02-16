@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { hexToBytes } from '../utils/utils'
-import VolcaSequence from '../utils/VolcaSequence'
+import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
+import VolcaSequence from '../utils/Volca/Sequence'
  /*
 +---------+------------------------------------------------+
 | Byte[H] |    Description                                 |
@@ -125,8 +126,9 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   }
 
   const parseSequence = (sequenceBytes) => {
-    const sequence = new VolcaSequence()
-    sequence.sysexData = sequenceBytes
+    const sequenceNumber = sequenceBytes.shift()
+    const sequence = new VolcaSequence(sequenceNumber)
+    sequence.fromBytes(convert7to8bit(sequenceBytes))
     _setCurrentSequence(sequence)
     setTimeout(() => {
       console.log('currentSequence is now ', currentSequence)

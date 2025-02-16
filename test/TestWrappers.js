@@ -1,8 +1,7 @@
 import { render } from '@testing-library/react';
 import { WebMidi as wm } from 'webmidi';
-export * from '@testing-library/react'
-import WebMidiContext, { WebMidiContextProvider } from '../contexts/WebMidiContext'
-import { VolcaFMContextProvider } from '../contexts/VolcaFMContext'
+import WebMidiContext, { WebMidiContextProvider } from '../src/contexts/WebMidiContext'
+import { VolcaFMContextProvider } from '../src/contexts/VolcaFMContext'
 
 export const webmidiRender = (
   ui,
