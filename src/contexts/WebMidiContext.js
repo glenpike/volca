@@ -18,6 +18,7 @@ const WebMidiContext = React.createContext({
 	getCurrentOutput: () => {},
   getCurrentInput: () => {},
 	sendSysexMessage: () => {},
+	sendUniversalMessage: () => {},
 })
 
 const WebMidiContextProvider = ({ children, manufacturer, WebMidi }) => {
@@ -107,12 +108,6 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }) => {
 					console.log('is not a valid Sysex message ', firstByte, lastByte)
 					return
 				}
-				const manufacturer = message.shift()
-				if(manufacturer != 0x42) {
-					console.log('is not from Korg device ', e)
-					return
-				}
-				console.log('valid sysex message for us ', message)
         setRxSysexMessage(message)
       });
       _setCurrentListener(listener)
@@ -139,6 +134,19 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }) => {
 		}
 	}
 
+	const sendUniversalMessage = (identification, data) => {
+		const output = getCurrentOutput()
+		if (output) {
+			console.log(`sending universal message: ${bytesToHex([identification])} ${bytesToHex(data)}`)
+			try {
+				setTxSysexMessage({ identification, data })
+				output.sendSysex(identification, data)
+			} catch(RangeError) {
+				console.log(`RangeError for: ${data}`)
+			}
+		}
+	}
+
 	const webMidiContextValue = {
 		midiInitialised,
 		currentOutput,
@@ -154,6 +162,7 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }) => {
     setCurrentInput,
     getCurrentInput,
 		sendSysexMessage,
+		sendUniversalMessage,
 	}
 
 	return (

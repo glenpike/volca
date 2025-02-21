@@ -79,7 +79,8 @@ class VolcaSequence {
     const numberOfSteps = data[15];
     // Initialize an array to hold the step objects
     this._steps = Array.from({ length: numberOfSteps }, () => ({}));
-
+    console.log('Number of steps: ', numberOfSteps)
+    
     // Parse the step On/Off status
     
     const reserved8 = data[8]

@@ -1,16 +1,21 @@
 import React, { useContext, useState } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext.js'
 import { bytesToHex } from '../../utils/utils.js'
+import WebMidiContext from '../../contexts/WebMidiContext.js'
 
 const SequenceDebug = () => {
 	const {
 		currentSequence,
 	} = useContext(VolcaFMContext)
 
+	const {
+		lastRxSysexMessage
+	} = useContext(WebMidiContext)
+
 	const [currentDump, setCurrentDump] = useState('')
 	const handleDumpSysex = () => {
 		
-		setCurrentDump(bytesToHex(currentSequence.toBytes()))
+		setCurrentDump(bytesToHex(lastRxSysexMessage))
 	}
 
 	const handleDumpJSON = () => {

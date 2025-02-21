@@ -3,8 +3,11 @@ import VolcaFMContext from '../../contexts/VolcaFMContext.js'
 
 const GetSequence = () => {
 	const {
+    deviceInquiry,
     currentSequenceNumber,
-		setCurrentSequenceNumber,
+    saveCurrentSequence,
+    loadCurrentSequence,
+		loadSequenceNumber,
     webMidiContext,
 	} = useContext(VolcaFMContext)
 
@@ -19,11 +22,10 @@ const GetSequence = () => {
     setSequenceNumber(event.target.value)
   }
 
-  const handleGetSequence = () => {
-    setCurrentSequenceNumber(_sequenceNumber)
+  const handleGetSequenceNumber = () => {
+    loadSequenceNumber(_sequenceNumber)
   }
 
-  
   if(!midiInitialised) {
     return null
   }
@@ -35,8 +37,11 @@ const GetSequence = () => {
 				<div className="sequence-select">
 					<label htmlFor="sequence-select">Sequence Number</label>{' '}
 					<input type="number" id="sequence-select" min="1" max="16" value={_sequenceNumber} onChange={handleSequenceNumberChange}/>
-				</div>
-				<button onClick={handleGetSequence}>Load</button>
+          <button onClick={handleGetSequenceNumber}>Load</button>
+        </div>
+        <button onClick={loadCurrentSequence}>Load Current</button>
+        <button onClick={saveCurrentSequence}>Save Current</button>
+				<button onClick={deviceInquiry}>Check Device</button>
 			</div>
     </fieldset>
   )

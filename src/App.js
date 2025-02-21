@@ -7,15 +7,15 @@ import Wrapper from './Wrapper';
 import './App.css';
 
 const KORG_MANUFACTURER_ID = 0x42
-const MIDI_CHANNEL = 3
+const MIDI_CHANNEL = 1
 
 function App() {
   return (
     <>
-      {/* <WebMidiContextProvider manufacturer={KORG_MANUFACTURER_ID} WebMidi={WebMidi}>
-        <WebMidiContext.Consumer> */}
-      <TestMidiContextProvider manufacturer={KORG_MANUFACTURER_ID}>
-        <TestMidiContext.Consumer>
+      <WebMidiContextProvider manufacturer={KORG_MANUFACTURER_ID} WebMidi={WebMidi}>
+        <WebMidiContext.Consumer>
+      {/* <TestMidiContextProvider manufacturer={KORG_MANUFACTURER_ID}>
+        <TestMidiContext.Consumer> */}
           {midiContext => (
             <VolcaFMContextProvider channel={MIDI_CHANNEL} injectedMidiContext={midiContext}>
               <div className="App">
@@ -23,10 +23,10 @@ function App() {
               </div>
             </VolcaFMContextProvider>
           )}
-        </TestMidiContext.Consumer>
-      </TestMidiContextProvider>
-        {/* </WebMidiContext.Consumer>
-      </WebMidiContextProvider> */}
+        {/* </TestMidiContext.Consumer>
+      </TestMidiContextProvider> */}
+        </WebMidiContext.Consumer>
+      </WebMidiContextProvider>
     </>
   )
 }

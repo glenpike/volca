@@ -127,7 +127,7 @@ class Step {
     */
   _unpackStep = (data) => {
     if (data.length < 112) {
-        throw new Error('Invalid MIDI step data length. Expected 112 bytes.');
+        throw new Error('Invalid MIDI step data length. Expected 112 bytes, received ' + data.length);
     }
 
     // Initialize an object to store parsed values

@@ -27,7 +27,10 @@ describe('GetSequence', () => {
         volcaRender(<GetSequence/>, { midiContext: webMidiContext })
       })
       expect(screen.getByLabelText('Sequence Number')).toBeInTheDocument()
-      expect(screen.getByRole('button', {text: 'Load'})).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Load'})).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Load Current'})).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Save Current'})).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Check Device'})).toBeInTheDocument()
     })
 
 
@@ -40,10 +43,24 @@ describe('GetSequence', () => {
       
 
       const number = screen.getByLabelText('Sequence Number')
-      const load = screen.getByRole('button', {text: 'Load'})
+      const load = screen.getByRole('button', { name: 'Load' })
       await user.type(number, '15')
       await user.click(load)
 
+      expect(webMidiContext.sendSysexMessage).toHaveBeenCalled()
+    })
+
+    test.skip('Sets the current sequence when I click the button', async () => {
+      const user = userEvent.setup()
+
+      await act(async () => {
+        volcaRender(<GetSequence/>, { midiContext: webMidiContext })
+      })
+
+      const load = screen.getByRole('button', { name: 'Load Current' })
+      await user.click(load)
+
+      //Need better expectation here.
       expect(webMidiContext.sendSysexMessage).toHaveBeenCalled()
     })
   })

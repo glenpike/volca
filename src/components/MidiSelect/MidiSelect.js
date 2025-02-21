@@ -43,8 +43,9 @@ const MidiSelect = () => {
     setCurrentChannel(event.target.value - 1)
   }
 
-  const channel = currentChannel ? currentChannel+1 : '';
-	return (
+  const channel = currentChannel !== null ? currentChannel+1 : '';
+
+  return (
     <div className='midi-selects'>
       <div className="midi-select">
         <label htmlFor="midi-input-select">Input Device</label>{' '}
