@@ -9,13 +9,13 @@ A project to enable me to download sequences from a Volca FM2 and display them, 
 [x] Expanding Midi 7bit bytes to 8bit and reverse
 [x] Parsing the Sysex into Plain Old JavaScript Objects (POJOs) with 'global' values (Sequence) and a set of Steps
 [x] Displaying the Sequence & Steps as JSON
+[x] Displaying the Sequence & Steps in form fields for editing
+[x] Saving a sequence back to the Volca (can only use 'current' sequence not numbered)
 
 ## Todo
-[ ] Turning a Sequence and Steps back into Sysex
-[ ] Sending it back to the Volca
-[ ] Allowing Editing of JSON
+[ ] Allowing Editing of Sequence
 [ ] Allowing conversion of a Sequence to and from a Midi file or similar
-[ ] Visual editing of sequence data
+[ ] Visual editing of sequence data can save to 'state'
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
