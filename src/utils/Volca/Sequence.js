@@ -117,7 +117,8 @@ class VolcaSequence {
       const stepDataOffset = 80 + i * 112;
       const stepData = data.slice(stepDataOffset, stepDataOffset + 112)
       const stepMotionFuncTranspose = !!(data[1872 + i] & 1);
-      this._steps[i] = new Step({ 
+      this._steps[i] = new Step({
+          id: i, 
           on: stepOnOff,
           active: stepActive,
           motionFuncTranspose: stepMotionFuncTranspose 

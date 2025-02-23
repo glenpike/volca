@@ -2,8 +2,8 @@ import React from 'react';
 import { noteNumberToName, noteNumberToOctave, musicalNotes } from '../../utils/MidiNotes';
 import './Note.css';
 
-const Note = ({ on, number, velocity, gateTime, trigger, motionData }) => {
-  const disabled = !(on && trigger);
+const Note = ({ note, motionData }) => {
+  const disabled = !(note.on && note.trigger);
 
   const noteOptions = ['-', ...musicalNotes]
   return (
@@ -11,14 +11,14 @@ const Note = ({ on, number, velocity, gateTime, trigger, motionData }) => {
       <input
         aria-label="Trigger Note"
         type="checkbox"
-        checked={trigger}
+        checked={note.trigger}
         onChange={(e) => console.log("Trigger: ", e.target.checked)}
-        disabled={!on}
+        disabled={!note.on}
       />
-      <select aria-label="Note" defaultValue={noteNumberToName(number)} disabled={disabled}>
-        {noteOptions.map((note, index) => (
-          <option key={index} value={note}>
-            {note}
+      <select aria-label="Note" defaultValue={noteNumberToName(note.number)} disabled={disabled}>
+        {noteOptions.map((noteString, index) => (
+          <option key={index} value={noteString}>
+            {noteString}
           </option>
         ))}
       </select>
@@ -26,12 +26,12 @@ const Note = ({ on, number, velocity, gateTime, trigger, motionData }) => {
         type="number"
         min="-1"
         max="8"
-        defaultValue={noteNumberToOctave(number)}
+        defaultValue={noteNumberToOctave(note.number)}
         aria-label="Octave"
         disabled={disabled}
       />
-      <input type="number" min="0" max="127" defaultValue={velocity} aria-label="Velocity" disabled={disabled}/>
-      <input type="number" min="0" max="100" defaultValue={gateTime} aria-label="Gate Time" disabled={disabled}/>
+      <input type="number" min="0" max="127" defaultValue={note.velocity} aria-label="Velocity" disabled={disabled}/>
+      <input type="number" min="0" max="100" defaultValue={note.gateTime} aria-label="Gate Time" disabled={disabled}/>
       <p className="noteMotionData">Motion Data: {JSON.stringify(motionData)}</p>
     </div>
   );

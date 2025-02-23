@@ -5,19 +5,14 @@ import './Step.css';
 
 const Step = ({ stepNumber, stepData }) => {
   const on = stepData.on
-  const noteData = stepData.data
+  const { notes = [], motionData = {} } = stepData.data
 
-  const notes = noteData.voiceNoteNumbers.map((note, index) => {
-    const { gateTime, trigger } = noteData.voiceGateTimes[index]
+  const noteComponents = notes.map((note) => {
     return (
-      <li className="step-note" key={index}>
+      <li className="step-note" key={note.stepNoteId}>
         <Note
-          on={on}
-          number={note[0]}
-          velocity={noteData.voiceVelocities[index]}
-          gateTime={gateTime}
-          trigger={trigger}
-          motionData={noteData.motionData} />
+          note={note}
+          motionData={motionData} />
       </li>
     )
   })
@@ -34,9 +29,9 @@ const Step = ({ stepNumber, stepData }) => {
         <input type="checkbox" checked={active} readOnly />
       </label> */}
       <ul className="step-notes">
-        {notes}
+        {noteComponents}
       </ul>
-      {/* <p>step {stepData.toJSON()}</p> */}
+      <p>step {stepData.toJSON()}</p>
     </span>
   )
 }

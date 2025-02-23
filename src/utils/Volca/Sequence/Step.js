@@ -1,4 +1,5 @@
 import { MOTION_PARAMS } from "./Motion"
+import Note from "./Note"
 //*note S9
 const GATE_TIME_LOOKUP = [
   "0", "1", "3", "4", "6", "7", "8", "10",
@@ -20,7 +21,8 @@ const GATE_TIME_LOOKUP = [
 ]
 
 class Step {
-  constructor({ on = false, active = false, motionFuncTranspose = false } = {}) {
+  constructor({ id, on = false, active = false, motionFuncTranspose = false } = {}) {
+    this._id = id
     this._on = on
     this._active = active
     this._motionFuncTranspose = motionFuncTranspose
@@ -40,8 +42,17 @@ class Step {
       on: this._on,
       active: this._active,
       motionFuncTranspose: this._motionFuncTranspose,
-      data: this._data
+      data: {
+        notes: this._data.notes.map(note => note.toObject()),
+        motionData: this._data.motionData,
+        reserved30: this._data.reserved30,
+        reserved108: this._data.reserved108
+      }
     })
+  }
+
+  get id() {
+    return this._id
   }
 
   get on() {
@@ -133,16 +144,20 @@ class Step {
     // Initialize an object to store parsed values
     this._data = {};
 
-    this._data.voiceNoteNumbers = []
-    this._data.voiceVelocities = []
-    this._data.voiceGateTimes = []
+    this._data.notes = []
+
     for(let i = 0;i < 6;i++) {
-      this._data.voiceNoteNumbers.push([
-        data[i * 2],
-        data[(i * 2) + 1]
-      ])
-      this._data.voiceVelocities.push(data[i + 18])
-      this._data.voiceGateTimes.push(this._unpackGateTime(data[24 + i]))
+      this._data.notes.push(new Note({
+        id: i,
+        stepId: this._id,
+        on: this._on,
+        note: [
+          data[i * 2],
+          data[(i * 2) + 1]
+        ],
+        velocity: data[i + 18],
+        gateTimeData: this._unpackGateTime(data[24 + i])
+      }))
     }
 
     // Reserved (Bytes 30-42): Typically not used
@@ -175,10 +190,10 @@ class Step {
     const data = new Array(112).fill(0)
 
     for(let i = 0;i < 6;i++) {
-      data[i * 2] = this._data.voiceNoteNumbers[i][0] & 0xFF
-      data[(i * 2) + 1] = this._data.voiceNoteNumbers[i][1] & 0xFF
-      data[i + 18] = this._data.voiceVelocities[i]
-      data[24 + i] = this._packGateTime(this._data.voiceGateTimes[i])
+      data[i * 2] = this._data.notes[i].note[0] & 0xFF
+      data[(i * 2) + 1] = this._data.notes[i].note[1] & 0xFF
+      data[i + 18] = this._data.notes[i].velocity
+      data[24 + i] = this._packGateTime(this._data.notes[i].gateTimeData)
     }
     // Reserved (Bytes 30-31): Typically not used
     for (let i = 0;i < 12;i++) {

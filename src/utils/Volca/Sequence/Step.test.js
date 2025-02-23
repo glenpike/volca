@@ -6,7 +6,7 @@ describe('Step', () => {
   test('Converts from bytes correctly', () => {
     const step = new Step()
     step.fromBytes(singleStepDataBytes)
-    expect(JSON.stringify(step.data)).toEqual(JSON.stringify(singleStep.data))
+    expect(step.toJSON()).toEqual(JSON.stringify(singleStep.data))
   });
   
   test('Converts to bytes correctly', () => {
@@ -28,5 +28,11 @@ describe('Step', () => {
       data: {...singleStep.data}
     })
     expect(step.toJSON()).toEqual(json)
+  });
+
+  test('Has the correct id', () => {
+    const id = 16
+    const step = new Step({ id })
+    expect(step.id).toEqual(id)
   });
 })
