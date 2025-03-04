@@ -372,7 +372,7 @@ MIDI EXCLUSIVE FORMAT   (R:Receive, T:Transmit)
 | F0,42,3g,      | EXCLUSIVE HEADER                                 |
 |    00,01,2F    |                                                  |
 | 0001 1100 (1C) | SEQUENCE DATA DUMP REQUEST             1CH       |
-| 0000 ssss (1s) | SEQUENSE No (0 ~ 15)                             |
+| 0000 ssss (0s) | SEQUENSE No (0 ~ 15)                             |
 | 1111 0111 (F7) | EOX                                              |
 +----------------+--------------------------------------------------+
  Receives this message, and transmits Func=4C or Func=24~26 message.
@@ -427,7 +427,7 @@ MIDI EXCLUSIVE FORMAT   (R:Receive, T:Transmit)
 | F0,42,3g,      | EXCLUSIVE HEADER                                 |
 |    00,01,2F    |                                                  |
 | 0100 1100 (4C) | SEQUENCE DATA DUMP                     4CH       |
-| 0000 ssss (1s) | SEQUENSE No (0 ~ 15)                             |
+| 0000 ssss (0s) | SEQUENSE No (0 ~ 15)                             |
 | 0ddd dddd (dd) | Data                                             |
 | 0ddd dddd (dd) |  :         Data Size         Conv. Size          |
 | 0ddd dddd (dd) |  :     2195Bytes (7bit) -> 1920Bytes (8bit)      |

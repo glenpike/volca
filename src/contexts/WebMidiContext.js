@@ -99,9 +99,11 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }) => {
     if(input) {
       const listener = WebMidi.getInputById(input.id).addListener("sysex", e => {
         // console.log(`sysex:`, e);
+				
 				// Validate and remove f0 / f7 head/tail?
 				// Validate manufacturer and remove...?
 				const {data: message } = e
+				console.log(`rx sysex: ${bytesToHex(message)}`)
 				const firstByte = message.shift()
 				const lastByte = message.pop()
 				if(firstByte != 0xf0 && lastByte != 0xf2) {
@@ -124,7 +126,7 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }) => {
 	const sendSysexMessage = (data) => {
 		const output = getCurrentOutput()
 		if (output) {
-			console.log(`sending sysex message: ${bytesToHex(data)}`)
+			console.log(`tx sysex: ${bytesToHex(data)}`)
 			try {
 				setTxSysexMessage({ currentManufacturer, data })
 				output.sendSysex(currentManufacturer, data)

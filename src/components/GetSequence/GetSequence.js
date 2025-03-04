@@ -6,6 +6,7 @@ const GetSequence = () => {
     deviceInquiry,
     currentSequenceNumber,
     saveCurrentSequence,
+    saveSequenceNumber,
     loadCurrentSequence,
 		loadSequenceNumber,
     webMidiContext,
@@ -26,6 +27,10 @@ const GetSequence = () => {
     loadSequenceNumber(_sequenceNumber)
   }
 
+  const handleSaveSequenceNumber = () => {
+    saveSequenceNumber(_sequenceNumber)
+  }
+
   if(!midiInitialised) {
     return null
   }
@@ -38,6 +43,7 @@ const GetSequence = () => {
 					<label htmlFor="sequence-select">Sequence Number</label>{' '}
 					<input type="number" id="sequence-select" min="1" max="16" value={_sequenceNumber} onChange={handleSequenceNumberChange}/>
           <button onClick={handleGetSequenceNumber}>Load</button>
+          <button onClick={handleSaveSequenceNumber}>Save</button>
         </div>
         <button onClick={loadCurrentSequence}>Load Current</button>
         <button onClick={saveCurrentSequence}>Save Current</button>

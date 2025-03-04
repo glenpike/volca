@@ -73,11 +73,11 @@ const currentSeqDumpRequest = [0x00, 0x01, 0x2F, 0x10]
 +----------------+--------------------------------------------------+
 */
 // const seqDumpRequest = '0x00, 0x01, 0x2F, 0x10'
-const seqDumpRequest = '0x00, 0x01, 0x2F, 0x1C, 0x1s'
+const seqDumpRequest = '0x00, 0x01, 0x2F, 0x1C, 0x0s'
 
 const exclusiveHeaderReply = [0x00, 0x01, 0x02F]//??
 
-const sequenceSendRequest = '0x00, 0x01, 0x2F, 0x4C, 0x1s'
+const sequenceSendRequest = '0x00, 0x01, 0x2F, 0x4C, 0x0s'
 const currentSequenceSendRequest = [0x00, 0x01, 0x2F, 0x40]
 
  const VolcaFMContext = React.createContext({
@@ -86,8 +86,9 @@ const currentSequenceSendRequest = [0x00, 0x01, 0x2F, 0x40]
 	setCurrentChannel: () => {},
 	currentSequenceNumber: null,
   saveCurrentSequence: () => {},
+  saveSequenceNumber: (n) => {},
   loadCurrentSequence: () => {},
-  loadSequenceNumber: () => {},
+  loadSequenceNumber: (n) => {},
 	currentSequence: null,
   webMidiContext: null,
 })
@@ -155,6 +156,15 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     const data = convert8to7bit(currentSequence.toBytes())
     const message = [_channelHex()].concat(currentSequenceSendRequest, data)
     console.log('saving current sequence ', bytesToHex(message))
+    sendSysexMessage(message)
+  }
+
+  const saveSequenceNumber = (number) => {
+    const seqNumber = Number(number - 1).toString(16)
+    const data = convert8to7bit(currentSequence.toBytes())
+    const request = hexToBytes(sequenceSendRequest.replace('s', seqNumber))
+    const message = [_channelHex()].concat(request, data)
+    console.log('saving sequence ', bytesToHex(message))
     sendSysexMessage(message)
   }
 
@@ -236,6 +246,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     currentSequenceNumber,
     loadSequenceNumber,
     saveCurrentSequence,
+    saveSequenceNumber,
     loadCurrentSequence,
     webMidiContext: injectedMidiContext,
   }
