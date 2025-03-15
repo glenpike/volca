@@ -3,14 +3,14 @@ import Note from '../Note/Note'
 import './Step.css';
 
 
-const Step = ({ stepNumber, stepData }) => {
-  const on = stepData.on
-  const { notes = [], motionData = {} } = stepData.data
-
+const Step = ({ step }) => {
+  const { id, on, notes = [], motionData = []} = step
+  
   const noteComponents = notes.map((note) => {
     return (
-      <li className="step-note" key={note.stepNoteId}>
+      <li className="step-note" key={`${id}_${note.id}`}>
         <Note
+          on={on}
           note={note}
           motionData={motionData} />
       </li>
@@ -18,8 +18,8 @@ const Step = ({ stepNumber, stepData }) => {
   })
 
   return (
-    <span key={stepNumber} className="step">
-      <p><strong>{stepNumber + 1}</strong></p>
+    <span key={id} className="step">
+      <p><strong>{id + 1}</strong></p>
       <label>
         Step On:
         <input type="checkbox" checked={on} readOnly />
@@ -31,7 +31,7 @@ const Step = ({ stepNumber, stepData }) => {
       <ul className="step-notes">
         {noteComponents}
       </ul>
-      <p>step {stepData.toJSON()}</p>
+      {/* <p>step {stepData.toJSON()}</p> */}
     </span>
   )
 }

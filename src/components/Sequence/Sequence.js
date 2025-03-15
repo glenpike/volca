@@ -26,7 +26,7 @@ const Sequence = () => {
   }
 
   const steps = currentSequence.steps.map((step, index) =>
-    <li className="sequence-step" key={index}><Step stepNumber={index} stepData={step}/></li>
+    <li className="sequence-step" key={index}><Step step={step}/></li>
   )
 
   return (
@@ -35,8 +35,8 @@ const Sequence = () => {
       <ul className="sequence-steps">
         {steps}
       </ul>
-      <p>Motion data: {currentSequence.motionData.toJSON()}</p>
-      <p>Settings: {currentSequence.sequenceSettings.toJSON()}</p>
+      <p>Motion data: {JSON.stringify(currentSequence.motionData)}</p>
+      <p>Settings: {JSON.stringify(currentSequence.sequenceSettings)}</p>
     </div>
   )
 }

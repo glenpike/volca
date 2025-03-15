@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { bytesToHex, hexToBytes } from '../utils/utils'
 import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
-import VolcaSequence from '../utils/Volca/Sequence'
+// import VolcaSequence from '../utils/Volca/Sequence'
+import { unpackSequenceBytes } from '../utils/Volca/parseSequence'
  /*
 +---------+------------------------------------------------+
 | Byte[H] |    Description                                 |
@@ -122,6 +123,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
 
   useEffect(() => {
     if(lastRxSysexMessage && lastRxSysexMessage.length) {
+      
       const firstByte = lastRxSysexMessage.shift()
       if(firstByte == 0x42) {
         console.log('Korg message for us ', lastRxSysexMessage)
@@ -129,7 +131,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
       } else if(firstByte == 0x7e) {
         parseUniversalMessage(lastRxSysexMessage)
       } else {
-        console.log('Unknown message for us ', lastRxSysexMessage)
+        console.log('Unknown message for us ', bytesToHex(lastRxSysexMessage))
       }
     }
   }, [lastRxSysexMessage])
@@ -221,17 +223,18 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
 
   const parseNumberedSequence = (sequenceBytes) => {
     const sequenceNumber = sequenceBytes.shift()
-    const sequence = new VolcaSequence(sequenceNumber)
-    sequence.fromBytes(convert7to8bit(sequenceBytes))
+    const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
+    // const sequence = new VolcaSequence(sequenceNumber)
+    // sequence.fromBytes(convert7to8bit(sequenceBytes))
+    console.log('_setCurrentSequence ', sequence)
     _setCurrentSequence(sequence)
-    setTimeout(() => {
-      console.log('currentSequence is now ', currentSequence)
-    }, 1000)
+    // setTimeout(() => {
+    //   console.log('currentSequence is now ', currentSequence)
+    // }, 1000)
   }
   
   const parseCurrentSequence = (sequenceBytes) => {
-    const sequence = new VolcaSequence(-1)
-    sequence.fromBytes(convert7to8bit(sequenceBytes))
+    const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
     _setCurrentSequence(sequence)
     setTimeout(() => {
       console.log('currentSequence is now ', currentSequence)

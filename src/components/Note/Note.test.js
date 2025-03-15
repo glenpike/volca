@@ -1,15 +1,15 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import Note from './Note'
-import VolcaNote from '../../utils/Volca/Sequence/Note'
 
 describe('Note Component', () => {
   let on = true
   let trigger = true
 
   beforeEach(() => {  
-    const note = new VolcaNote({ id: 1, stepId: 1, on, note: [60, 0], velocity: 100, gateTimeData: { gateTime: 50, trigger } })
+    const note = { note: [60, 0], velocity: 100, gateTime: "50", trigger }
     const defaultProps = {
+      on,
       note,
       motionData: { x: 0, y: 0 }
     }

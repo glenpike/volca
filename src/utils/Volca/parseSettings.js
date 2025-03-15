@@ -57,7 +57,7 @@ export const packSettingsData = (data) => {
 }
 
 export const parseSettingsBytes = (settingsBytes) => {
-  data = {}
+  const data = {}
   data.motionSwitches = {}
   const states = settingsBytes[0]
   for (let i = 0; i < MOTION_SWITCHES.length; i++) {

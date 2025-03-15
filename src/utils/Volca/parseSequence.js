@@ -1,8 +1,8 @@
 import { packMotionData, parseMotionBytes } from "./parseMotion";
 import { packSettingsData, parseSettingsBytes } from "./parseSettings";
-import { parseStepBytes } from "./parseStep";
+import { parseStepBytes, packStepData } from "./parseStep";
 
-export const unpackSequenceBytes = (bytes) => {
+export const parseSequenceBytes = (bytes) => {
   const header = String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]);
   if (header !== 'PTST') {
       throw new Error('Invalid header');
@@ -50,12 +50,16 @@ export const unpackSequenceBytes = (bytes) => {
     const stepDataOffset = 80 + i * 112;
     const stepData = bytes.slice(stepDataOffset, stepDataOffset + 112)
     const stepMotionFuncTranspose = !!(bytes[1872 + i] & 1);
+    const { motionData, notes, reserved30, reserved108 } = parseStepBytes(stepData)
     steps[i] = {
       id: i, 
       on: stepOnOff,
       active: stepActive,
       motionFuncTranspose: stepMotionFuncTranspose,
-      data: parseStepBytes(stepData)
+      motionData,
+      notes,
+      reserved30,
+      reserved108, 
     }
   }
 
@@ -103,7 +107,7 @@ export const packSequenceData = ({
     reserved1888_1915
   }
 }) => {
-  const numberOfSteps = steps.length
+  // const numberOfSteps = steps.length
   const bytes = new Array(1919).fill(0)
 
   bytes[0] = 'P'.charCodeAt(0)
@@ -155,8 +159,9 @@ export const packSequenceData = ({
     const onOffByteIndex = i < 8 ? 6 : 7;
     bytes[byteIndex] |= (step.active & 1) << bitIndex
     bytes[onOffByteIndex] |= (step.on & 1) << bitIndex
-    const stepDataOffset = 80 + i * 112;      
-    Array.from(packStepData(step.data)).forEach((value, j) => {
+    const stepDataOffset = 80 + i * 112;
+    const { motionData, notes, reserved30, reserved108 } = step
+    Array.from(packStepData({ motionData, notes, reserved30, reserved108 })).forEach((value, j) => {
       bytes[stepDataOffset + j] = value
     })
     bytes[1872 + i] = step.motionFuncTranspose & 1
