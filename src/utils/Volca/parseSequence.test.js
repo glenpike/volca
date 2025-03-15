@@ -1,4 +1,4 @@
-import sequenceObjects from "../../../test/sequenceObjects";
+import { motionData, sequenceSettings, singleStep, reserved } from "../../../test/sequenceObjects";
 import { 
   unpackedData,
   motionParamBytes,
@@ -10,17 +10,17 @@ import {
 
 import { parseSequenceBytes, packSequenceData } from "./parseSequence";
 
-import { packSettingsData } from "./parseSettings";
-import { packMotionData } from "./parseMotion";
-import { packStepData } from "./parseStep";
+import * as settingsFuncs from "./parseSettings";
+import * as motionFuncs from "./parseMotion";
+import * as stepFuncs from "./parseStep";
 
-jest.spyOn(packMotionData).mockReturnValue({ paramBytes: motionParamBytes, switchBytes: motionSwitchBytes })
-jest.spyOn(packSettingsData).mockReturnValue(sequenceSettingsBytes)
-jest.spyOn(packStepData).mockReturnValue(singleStepDataBytes)
+jest.spyOn(motionFuncs, 'packMotionData').mockImplementation(() => ({ paramBytes: motionParamBytes, switchBytes: motionSwitchBytes }))
+jest.spyOn(settingsFuncs, 'packSettingsData').mockImplementation(() => (sequenceSettingsBytes))
+jest.spyOn(stepFuncs, 'packStepData').mockImplementation(() => (singleStepDataBytes))
 
       
-describe('Sequence', () => {
-  describe('fromBytes', () => {
+describe('Sequences', () => {
+  describe('parseSequenceBytes', () => {
     let sequence
     
     beforeEach(() => {
@@ -28,11 +28,15 @@ describe('Sequence', () => {
     })
 
     test('Creates motion data correctly', () => {
-      expect(sequence.motionData).toBeInstanceOf(Motion)
+      expect(sequence.motionData).toBeDefined
     })
 
-    test('Creates number correctly', () => {
-      expect(sequence.number).toEqual(2)
+    test('Creates settings data correctly', () => {
+      expect(sequence.sequenceSettings).toBeDefined
+    })
+
+    test('Creates reserved data correctly', () => {
+      expect(sequence.reserved).toBeDefined
     })
 
     test('Creates program correctly', () => {
@@ -45,25 +49,22 @@ describe('Sequence', () => {
 
     test('Step has correct data', () => {
       const step = sequence.steps[0]
-      // expect(step).toBeInstanceOf(Step)
       expect(step.on).toEqual(true)
       expect(step.active).toEqual(true)
       expect(step.motionFuncTranspose).toEqual(false)
-      // expect(step.toBytes()).toEqual(singleStepDataBytes)
     })
   })
 
-  describe('toBytes', () => {
+  describe('packSequenceData', () => {
     let sequence
     
     beforeEach(() => {
       sequence = {
-        number: sequenceObjects.number,
-        programNumber: sequenceObjects.programNumber,
-        motionData: motion,
-        sequenceSettings: settings,
-        steps: Array(16).fill(step),
-        reserved:sequenceObjects.reserved
+        programNumber: 9,
+        motionData,
+        sequenceSettings,
+        steps: Array(16).fill(singleStep),
+        reserved
       }
     })
 

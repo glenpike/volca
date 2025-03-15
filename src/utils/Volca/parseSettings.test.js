@@ -1,6 +1,6 @@
 import { parseSettingsBytes, packSettingsData } from "./parseSettings";
-import { sequenceSettingsBytes } from "../../../../test/sequenceBytes"
-import { sequenceSettings } from "../../../../test/sequenceObjects"
+import { sequenceSettingsBytes } from "../../../test/sequenceBytes"
+import { sequenceSettings } from "../../../test/sequenceObjects"
 
 describe('Settings', () => {
   test('Converts from bytes correctly', () => {

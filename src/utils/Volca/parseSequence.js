@@ -14,7 +14,7 @@ export const parseSequenceBytes = (bytes) => {
   const numberOfSteps = bytes[15];
   // Initialize an array to hold the step objects
   const steps = Array.from({ length: numberOfSteps }, () => ({}));
-  console.log('Number of steps: ', numberOfSteps)
+  // console.log('Number of steps: ', numberOfSteps)
   
   // Parse the step On/Off status
   

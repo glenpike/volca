@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { bytesToHex, hexToBytes } from '../utils/utils'
 import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
-// import VolcaSequence from '../utils/Volca/Sequence'
-import { unpackSequenceBytes } from '../utils/Volca/parseSequence'
+import { parseSequenceBytes } from '../utils/Volca/parseSequence'
  /*
 +---------+------------------------------------------------+
 | Byte[H] |    Description                                 |
