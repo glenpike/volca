@@ -4,8 +4,8 @@ import '@testing-library/jest-dom/extend-expect'
 
 import Sequence from './Sequence'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
-import VolcaSequence from '../../utils/Volca/Sequence'
 import { unpackedData } from '../../../test/sequenceBytes'
+import { parseSequenceBytes } from '../../utils/Volca/parseSequence'
 
 jest.mock('../Step/Step.js', () => () => <div className="step">Mock Step</div>);
 
@@ -29,8 +29,7 @@ describe('Sequence Component', () => {
   })
 
   test('renders null when MIDI is not initialised', () => {
-    const sequence = new VolcaSequence(1)
-    sequence.fromBytes([...unpackedData])
+    const sequence = parseSequenceBytes([...unpackedData])
     const contextValue = {
       currentSequence: sequence,
       currentSequenceNumber: 1,
@@ -41,8 +40,7 @@ describe('Sequence Component', () => {
   })
 
   test('renders sequence steps when sequence is loaded', () => {
-    const sequence = new VolcaSequence(1)
-    sequence.fromBytes([...unpackedData])
+    const sequence = parseSequenceBytes([...unpackedData])
     const contextValue = {
       currentSequence: sequence,
       currentSequenceNumber: 1,
@@ -54,8 +52,7 @@ describe('Sequence Component', () => {
   })
 
   test('renders motion data correctly', () => {
-    const sequence = new VolcaSequence(1)
-    sequence.fromBytes([...unpackedData])
+    const sequence = parseSequenceBytes([...unpackedData])
     const contextValue = {
       currentSequence: sequence,
       currentSequenceNumber: 1,

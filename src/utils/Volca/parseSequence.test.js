@@ -10,15 +10,9 @@ import {
 
 import { parseSequenceBytes, packSequenceData } from "./parseSequence";
 
-import * as settingsFuncs from "./parseSettings";
-import * as motionFuncs from "./parseMotion";
-import * as stepFuncs from "./parseStep";
+// TODO, it would be nice to mock the parse / pack funcs for step/motion/settings
+// and just test the sequence functions here
 
-jest.spyOn(motionFuncs, 'packMotionData').mockImplementation(() => ({ paramBytes: motionParamBytes, switchBytes: motionSwitchBytes }))
-jest.spyOn(settingsFuncs, 'packSettingsData').mockImplementation(() => (sequenceSettingsBytes))
-jest.spyOn(stepFuncs, 'packStepData').mockImplementation(() => (singleStepDataBytes))
-
-      
 describe('Sequences', () => {
   describe('parseSequenceBytes', () => {
     let sequence
@@ -60,6 +54,7 @@ describe('Sequences', () => {
     
     beforeEach(() => {
       sequence = {
+        numberOfSteps: 16,
         programNumber: 9,
         motionData,
         sequenceSettings,
@@ -81,7 +76,7 @@ describe('Sequences', () => {
     })
 
     test('Packs the step "on" data' , () => {
-      expect(packSequenceData(sequence).slice(6, 8)).toEqual([0xFF, 0xFF])
+      expect(packSequenceData(sequence).slice(6, 8)).toEqual([0x00, 0x00])
     })
 
     test('Packs the active step data' , () => {
@@ -89,7 +84,8 @@ describe('Sequences', () => {
     })
 
     test('Packs the correct number of steps' , () => {
-      expect(packSequenceData(sequence)[15]).toEqual(16)
+      const bytes = packSequenceData(sequence)
+      expect(bytes[15]).toEqual(16)
     })
 
     test('Packs the motion params', () => {

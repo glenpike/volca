@@ -6,6 +6,7 @@ const Note = ({ on, note, motionData }) => {
   const { trigger, note: [noteNumber], velocity, gateTime } = note
   const disabled = !(on && trigger);
   const noteOptions = ['-', ...musicalNotes]
+
   return (
     <div className="note">
       <input

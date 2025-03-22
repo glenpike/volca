@@ -1,42 +1,40 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import Step from './Step';
-import VolcaStep from '../../utils/Volca/Sequence/Step';
-
-jest.mock('../Note/Note.js', () => () => <div className="mock-note">Mock Note</div>);
 
 describe('Step Component', () => {
-  const mockStepData = new VolcaStep({
+  const mockStepData = {
+    id: 0,
     on: true,
-    active: true
-  })
-  beforeEach(() => {
-    mockStepData.data = {
-        voiceNoteNumbers: [[60], [62], [64]],
-        voiceGateTimes: [{ gateTime: 0.5, trigger: true }, { gateTime: 0.5, trigger: true }, { gateTime: 0.5, trigger: true }],
-        voiceVelocities: [100, 100, 100],
-        motionData: {}
-      }
-  })
+    active: true,
+    notes: [
+      { id: 0, note: [60], velocity: 100, gateTime: 0.5, trigger: true },
+      { id: 1, note: [48], velocity: 80, gateTime: 0.7, trigger: true },
+      { id: 2, note: [72], velocity: 60, gateTime: 0.4, trigger: true },
+    ],
+    motionData: {},
+    motionFuncTranspose: false
+  }
 
+  // TODO: On change, etc...
   it('renders without crashing', () => {
-    const { container } = render(<Step stepNumber={0} stepData={mockStepData} />);
+    const { container } = render(<Step step={mockStepData} />);
     expect(container).toBeInTheDocument();
   });
 
   it('displays the correct step number', () => {
-    const { getByText } = render(<Step stepNumber={0} stepData={mockStepData} />);
+    const { getByText } = render(<Step step={mockStepData} />);
     expect(getByText('1')).toBeInTheDocument();
   });
 
   it('displays the correct checkbox state for "Step On"', () => {
-    const { getByLabelText } = render(<Step stepNumber={0} stepData={mockStepData} />);
+    const { getByLabelText } = render(<Step step={mockStepData} />);
     const checkbox = getByLabelText('Step On:');
     expect(checkbox.checked).toBe(true);
   });
 
   it('renders the correct number of notes', () => {
-    const { container } = render(<Step stepNumber={0} stepData={mockStepData} />);
+    const { container } = render(<Step step={mockStepData} />);
     const notes = container.querySelectorAll('.step-note');
     expect(notes.length).toBe(3);
   });
