@@ -1,15 +1,17 @@
 import React, { useContext } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
+import useVolcaStore from '../../stores/useVolcaStore'
 import Step from '../Step/Step'
 import './Sequence.css';
 
 const Sequence = () => {
-
   const {
-		currentSequence,
-    currentSequenceNumber,
     webMidiContext
 	} = useContext(VolcaFMContext)
+  
+  const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
+  console.log('Sequence currentSequenceNumber', currentSequenceNumber)
+  const currentSequence = useVolcaStore(state => state.sequences.find((seq) => seq.programNumber === currentSequenceNumber))
   
   const {
     midiInitialised,
@@ -32,6 +34,7 @@ const Sequence = () => {
   return (
     <div className='sequence'>
       <h2>Current Sequence {currentSequenceNumber}</h2>
+      <p>Programme Number: {currentSequence.programNumber}</p>
       <ul className="sequence-steps">
         {steps}
       </ul>
