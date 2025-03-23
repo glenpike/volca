@@ -50,7 +50,8 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   // )
   const setCurrentSequenceNumber = useVolcaStore((state) => state.setCurrentSequenceNumber);
   const addOrUpdateSequence = useVolcaStore((state) => state.addOrUpdateSequence);
-
+  const getSequence = useVolcaStore(state => state.getSequence)
+    
   const [currentChannel, _setCurrentChannel] = useState(channel - 1)
   
   const deviceInquiry = () => {
@@ -112,7 +113,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
 
   const saveSequenceNumber = (number) => {
     //Get it from the store!!!
-    const sequence = useVolcaStore(state => state.sequences.find((seq) => seq.programNumber === number))
+    const sequence = getSequence(number)
     if(!sequence) {
       console.log(`No sequence ${number} to save`)
       return

@@ -4,6 +4,13 @@ export const useVolcaStore = create((set) => ({
   currentSequenceNumber: null,
   sequences: [],
   setCurrentSequenceNumber: (number) => set({ currentSequenceNumber: number }),
+  getSequence: (number) => set((state) => {
+    const sequence = state.sequences.find((seq) => seq.programNumber === number);
+    if (sequence) {
+      return sequence;
+    }
+    return null;
+  }),
   clearSequences: () => set({ sequences: [] }),
   addOrUpdateSequence: (sequence) => set((state) => {
     const existingSequenceIndex = state.sequences.findIndex((seq) => seq.programNumber === sequence.programNumber);
