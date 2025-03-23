@@ -4,12 +4,13 @@ import '@testing-library/jest-dom'
 import MessageDisplay from './MessageDisplay.js'
 import WebMidiContext from '../../contexts/WebMidiContext.js'
 
-describe.skip('MessageDisplay', () => {
+describe('MessageDisplay', () => {
 	const provider = {
 		lastSysexMessage: null,
 	}
 
 	beforeEach(() => {
+		// console.log('beforeEach', provider)
 		render(
 			<WebMidiContext.Provider value={provider}>
 				<MessageDisplay />
@@ -29,9 +30,11 @@ describe.skip('MessageDisplay', () => {
 		expect(screen.getByLabelText('Last Rx Sysex Message').value).toEqual('')
 	})
 
-	describe('When midi is not initialised', () => {
+	describe.skip('When midi is not initialised', () => {
 		beforeAll(() => {
 			provider.lastSysexMessage = { manufacturer: 0xaa, data: [1, 2, 3, 4, 5, 6] }
+			console.log('beforeAll', provider)
+			
 		})
 		afterAll(() => {
 			provider.lastSysexMessage = null

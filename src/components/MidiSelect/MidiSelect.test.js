@@ -26,7 +26,7 @@ const mebWidi = {
 }
 
 describe('MidiSelect ', () => {
-  test.skip('WebMidiMocking', async () => {
+  test  ('WebMidiMocking', async () => {
     console.log('mebWidi.enable ', mebWidi.enable)
     const value = await mebWidi.enable({ foo: 'bar' })
     console.log('value ', value)
