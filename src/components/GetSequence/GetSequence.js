@@ -1,16 +1,18 @@
 import React, { useContext, useState } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext.js'
+import { useVolcaStore } from '../../stores/useVolcaStore.js'
 
 const GetSequence = () => {
 	const {
     deviceInquiry,
-    currentSequenceNumber,
-    saveCurrentSequence,
     saveSequenceNumber,
     loadCurrentSequence,
 		loadSequenceNumber,
     webMidiContext,
 	} = useContext(VolcaFMContext)
+
+  const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
+    
 
   const {
     midiInitialised,
@@ -20,7 +22,7 @@ const GetSequence = () => {
   const [_sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber)
 
   const handleSequenceNumberChange = (event) => {
-    setSequenceNumber(event.target.value)
+    setSequenceNumber(Number(event.target.value))
   }
 
   const handleGetSequenceNumber = () => {
@@ -46,8 +48,7 @@ const GetSequence = () => {
           <button onClick={handleSaveSequenceNumber}>Save</button>
         </div>
         <button onClick={loadCurrentSequence}>Load Current</button>
-        <button onClick={saveCurrentSequence}>Save Current</button>
-				<button onClick={deviceInquiry}>Check Device</button>
+        <button onClick={deviceInquiry}>Check Device</button>
 			</div>
     </fieldset>
   )

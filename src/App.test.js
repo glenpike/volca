@@ -1,5 +1,11 @@
 import { render, screen, act, } from '@testing-library/react';
+import { mockUseVolcaStore } from '../test/mockUseVolcaStore'
+
 import App from './App';
+
+const storeState = { 
+  currentSequenceNumber: 10,
+}
 
 jest.mock('webmidi', () => {
   const input = {
@@ -38,6 +44,9 @@ jest.mock('webmidi', () => {
 
 describe('App', () => {
   test('renders ok', async () => {
+    jest.clearAllMocks();
+    mockUseVolcaStore(storeState);
+
     await act(async () => {
       render(<App />)
     })

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
-import useVolcaStore from '../../stores/useVolcaStore'
+import { useVolcaStore } from '../../stores/useVolcaStore'
 import Step from '../Step/Step'
 import './Sequence.css';
 

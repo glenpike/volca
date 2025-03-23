@@ -1,20 +1,46 @@
-import { act, screen } from '@testing-library/react';
+import { act, screen, render } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event'
 
 import GetSequence from "./GetSequence"
-import { volcaRender } from '../../../test/TestWrappers';
+import VolcaFMContext from '../../contexts/VolcaFMContext'
+import { mockUseVolcaStore } from '../../../test/mockUseVolcaStore'
 
-//We can't quite mock the VolcaFMContext, which would be nicer perhaps?
+
 const webMidiContext = {
   midiInitialised: false,
-  sendSysexMessage: jest.fn(),
-  lastRxSysexMessage: ''
+}
+
+const storeState = { 
+  currentSequenceNumber: 10,
+}
+
+const loadSequenceNumber = jest.fn()
+const saveSequenceNumber = jest.fn()
+const loadCurrentSequence = jest.fn()
+const deviceInquiry = jest.fn()
+
+const renderWithContext = () => {
+  jest.clearAllMocks();
+  mockUseVolcaStore(storeState);
+  const contextValue = {
+    loadSequenceNumber,
+    saveSequenceNumber,
+    loadCurrentSequence,
+    deviceInquiry, 
+    webMidiContext,
+  }
+
+  return render(
+    <VolcaFMContext.Provider value={contextValue}>
+      <GetSequence />
+    </VolcaFMContext.Provider>
+  )
 }
 
 describe('GetSequence', () => {
   test('Renders the empty GetSequence block if Midi is not initialised', async () => {
     await act(async () => {
-      volcaRender(<GetSequence/>, { midiContext: webMidiContext })
+      renderWithContext()
     })
     expect(screen.queryByText('Sequence Number')).not.toBeInTheDocument()
   })
@@ -24,44 +50,46 @@ describe('GetSequence', () => {
       webMidiContext.midiInitialised = true
       
       await act(async () => {
-        volcaRender(<GetSequence/>, { midiContext: webMidiContext })
+        renderWithContext()
       })
       expect(screen.getByLabelText('Sequence Number')).toBeInTheDocument()
       expect(screen.getByRole('button', {name: 'Load'})).toBeInTheDocument()
       expect(screen.getByRole('button', {name: 'Load Current'})).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: 'Save Current'})).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument()
       expect(screen.getByRole('button', {name: 'Check Device'})).toBeInTheDocument()
     })
 
 
-    test('Sets the chosen sequence when I click the button', async () => {
+    test('Loads the chosen sequence when I click the button', async () => {
+      webMidiContext.midiInitialised = true
+
       const user = userEvent.setup()
 
       await act(async () => {
-        volcaRender(<GetSequence/>, { midiContext: webMidiContext })
+        renderWithContext()
       })
       
-
       const number = screen.getByLabelText('Sequence Number')
       const load = screen.getByRole('button', { name: 'Load' })
+      await user.clear(number)
       await user.type(number, '15')
       await user.click(load)
 
-      expect(webMidiContext.sendSysexMessage).toHaveBeenCalled()
+      expect(loadSequenceNumber).toHaveBeenCalledWith(15)
     })
 
-    test.skip('Sets the current sequence when I click the button', async () => {
+    test('calls Load current sequence when I click the button', async () => {
+      webMidiContext.midiInitialised = true
       const user = userEvent.setup()
 
       await act(async () => {
-        volcaRender(<GetSequence/>, { midiContext: webMidiContext })
+        renderWithContext()
       })
 
       const load = screen.getByRole('button', { name: 'Load Current' })
       await user.click(load)
 
-      //Need better expectation here.
-      expect(webMidiContext.sendSysexMessage).toHaveBeenCalled()
+      expect(loadCurrentSequence).toHaveBeenCalled()
     })
   })
 })

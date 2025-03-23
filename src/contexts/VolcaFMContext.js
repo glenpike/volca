@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { bytesToHex, hexToBytes } from '../utils/utils'
 import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
 import { parseSequenceBytes } from '../utils/Volca/parseSequence'
-import useVolcaStore from '../stores/useVolcaStore'
+import { useVolcaStore } from '../stores/useVolcaStore'
+import { shallow } from 'zustand/shallow'
 
 const deviceInquiryRequest = '0x0c, 0x06, 0x01'
 
@@ -17,18 +18,15 @@ const sequenceSendRequest = '0x00, 0x01, 0x2F, 0x4C, 0x0s'
 const currentSequenceSendRequest = [0x00, 0x01, 0x2F, 0x40]
 
  const VolcaFMContext = React.createContext(
-  /*{
+{
   deviceInquiry: () => {},
   currentChannel: null,
 	setCurrentChannel: () => {},
-	currentSequenceNumber: null,
-  saveCurrentSequence: () => {},
+  loadSequenceNumber: (n) => {},
   saveSequenceNumber: (n) => {},
   loadCurrentSequence: () => {},
-  loadSequenceNumber: (n) => {},
-	currentSequence: null,
   webMidiContext: null,
-}*/
+}
 )
 
 const UNKNOWN_MESSAGE = 'unknown-message'
@@ -42,22 +40,18 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     sendUniversalMessage,
   } = injectedMidiContext;
 
-  const {
-    // currentChannel,
-    // setCurrentChannel,
-    currentSequenceNumber,
-    setCurrentSequenceNumber,
-    // currentSequence,
-    addOrUpdateSequence,
-    // parseNumberedSequence,
-    // parseCurrentSequence,
-  } = useVolcaStore();
-
-  const currentSequence = useVolcaStore(state => state.sequences.findIndex((seq) => seq.programNumber === currentSequenceNumber))
+  // Throws errors in testing
+  // const { setCurrentSequenceNumber, addOrUpdateSequence } = useVolcaStore(
+  //   (state) => ({
+  //     setCurrentSequenceNumber: state.setCurrentSequenceNumber,
+  //     addOrUpdateSequence: state.addOrUpdateSequence,
+  //   }),
+  //   shallow
+  // )
+  const setCurrentSequenceNumber = useVolcaStore((state) => state.setCurrentSequenceNumber);
+  const addOrUpdateSequence = useVolcaStore((state) => state.addOrUpdateSequence);
 
   const [currentChannel, _setCurrentChannel] = useState(channel - 1)
-  // const [currentSequenceNumber, _setCurrentSequenceNumber] = useState(1)
-  // const [currentSequence, _setCurrentSequence] = useState([])
   
   const deviceInquiry = () => {
     console.log('VolcaFMContextProvider deviceInquiry - sending deviceInquiryRequest')
@@ -91,8 +85,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   }
 
   const loadSequenceNumber = (number) => {
-    setCurrentSequenceNumber(number)
-    // setCurrentSequence([])
+    setCurrentSequenceNumber(-1)
     const seqNumber = Number(number - 1).toString(16)
     const request = hexToBytes(seqDumpRequest.replace('s', seqNumber))
     sendSysexMessage([_channelHex()].concat(request))
@@ -100,22 +93,33 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
 
   const loadCurrentSequence = () => {
     setCurrentSequenceNumber(-1)
-    // setCurrentSequence([])
     sendSysexMessage([_channelHex()].concat(currentSeqDumpRequest))
   }
 
-  // Do we want to allow this?
-  const saveCurrentSequence = () => {
-    const data = convert8to7bit(currentSequence.toBytes())
-    const message = [_channelHex()].concat(currentSequenceSendRequest, data)
-    console.log('saving current sequence ', bytesToHex(message))
-    sendSysexMessage(message)
-  }
+  // Do we want to do this?
+  // The current sequence on Volca is not the same as the current sequence in the store
+  // const saveCurrentSequence = () => {
+  //   const currentSequence = useVolcaStore(state => state.sequences.find((seq) => seq.programNumber === currentSequenceNumber))
+  //   if(!currentSequence) {
+  //     console.log('No current sequence to save')
+  //     return
+  //   }
+  //   const data = convert8to7bit(currentSequence.toBytes())
+  //   const message = [_channelHex()].concat(currentSequenceSendRequest, data)
+  //   console.log('saving current sequence ', bytesToHex(message))
+  //   sendSysexMessage(message)
+  // }
 
-  // FIXME to saveToSequenceNumber 
   const saveSequenceNumber = (number) => {
+    //Get it from the store!!!
+    const sequence = useVolcaStore(state => state.sequences.find((seq) => seq.programNumber === number))
+    if(!sequence) {
+      console.log(`No sequence ${number} to save`)
+      return
+    }
+    
     const seqNumber = Number(number - 1).toString(16)
-    const data = convert8to7bit(currentSequence.toBytes())
+    const data = convert8to7bit(sequence.toBytes())
     const request = hexToBytes(sequenceSendRequest.replace('s', seqNumber))
     const message = [_channelHex()].concat(request, data)
     console.log('saving sequence ', bytesToHex(message))
@@ -186,19 +190,13 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
     addOrUpdateSequence(sequence)
     setCurrentSequenceNumber(sequence.programNumber)
-    // setTimeout(() => {
-    //   console.log('currentSequence is now ', currentSequence)
-    // }, 1000)
   }
 
   const volcaFMContextValue = {
     deviceInquiry,
     currentChannel,
     setCurrentChannel,
-    // currentSequence,
-    // currentSequenceNumber,
     loadSequenceNumber,
-    saveCurrentSequence,
     saveSequenceNumber,
     loadCurrentSequence,
     webMidiContext: injectedMidiContext,
