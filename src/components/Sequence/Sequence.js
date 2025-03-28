@@ -28,7 +28,7 @@ const Sequence = () => {
   }
 
   const steps = currentSequence.steps.map((step, index) =>
-    <li className="sequence-step" key={index}><Step step={step}/></li>
+    <li className="sequence-step" key={index}><Step step={step} sequenceId={currentSequence.programNumber}/></li>
   )
 
   return (

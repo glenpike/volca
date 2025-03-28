@@ -3,15 +3,17 @@ import Note from '../Note/Note'
 import './Step.css';
 
 
-const Step = ({ step }) => {
+const Step = ({ step, sequenceId }) => {
   const { id, on, notes = [], motionData = []} = step
   
   const noteComponents = notes.map((note) => {
     return (
       <li className="step-note" key={`${id}_${note.id}`}>
         <Note
+          sequenceId={sequenceId}
+          stepId={id}
+          noteId={note.id}
           on={on}
-          note={note}
           motionData={motionData} />
       </li>
     )

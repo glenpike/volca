@@ -37,20 +37,25 @@ export const useVolcaStore = create((set) => ({
   //   }
   //   return { sequences: [...state.sequences] };
   // }),
-  // updateNote: (sequenceId, stepId, noteId, updatedData) => set((state) => {
-  //   const sequence = state.sequences.find((seq) => seq.id === sequenceId);
-  //   if (sequence) {
-  //     const step = sequence.steps.find((step) => step.id === stepId);
-  //     if (step) {
-  //       const noteIndex = step.notes.findIndex((note) => note.id === noteId);
-  //       if (noteIndex !== -1) {
-  //         step.notes[noteIndex] = {
-  //           ...step.notes[noteIndex],
-  //           ...updatedData,
-  //         };
-  //       }
-  //     }
-  //   }
-  //   return { sequences: [...state.sequences] };
-  // }),
+  updateNote: (sequenceId, stepId, noteId, updatedData) => set((state) => {
+    console.log('updateNote ', sequenceId)
+    const sequence = state.sequences.find((seq) => seq.programNumber === sequenceId);
+    if (sequence) {
+      console.log('updateNote sequence', stepId, noteId)
+      const step = sequence.steps.find((step) => step.id === stepId);
+      if (step) {
+        const noteIndex = step.notes.findIndex((note) => note.id === noteId);
+        console.log('updateNote step', noteId, noteIndex)
+        if (noteIndex !== -1) {
+          step.notes[noteIndex] = {
+            ...step.notes[noteIndex],
+            ...updatedData,
+          };
+          console.log('updateNote ', updatedData)
+    
+        }
+      }
+    }
+    return { sequences: [...state.sequences] };
+  }),
 }));
