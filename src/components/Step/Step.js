@@ -26,14 +26,10 @@ const Step = ({ step, sequenceId }) => {
         Step On:
         <input type="checkbox" checked={on} readOnly />
       </label>
-      {/* <label>
-        Active:
-        <input type="checkbox" checked={active} readOnly />
-      </label> */}
       <ul className="step-notes">
         {noteComponents}
       </ul>
-      {/* <p>step {stepData.toJSON()}</p> */}
+      {/* <p>step {JSON.stringify(motionData)}</p> */}
     </span>
   )
 }

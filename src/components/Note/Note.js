@@ -19,14 +19,17 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }) => {
   
   const { trigger, note: [noteNumber, otherNoteValue], velocity, gateTime } = note
   const disabled = !(on && trigger)
-  const noteOptions = ['-', ...musicalNotes]
+  const noteOptions = [...musicalNotes]
+  const tiedNote = gateTime == 127
+
+  const handleTriggerChange = (event) => {
+    const trigger = !!event.target.checked
+    updateNote(sequenceId, stepId, noteId, { trigger })
+  }
 
   const handleNoteChange = (event) => {
-    // Or what??
-    if(event.target.value !== '-') {
-      const newNoteNumber = noteToMidi(`${event.target.value}${noteNumberToOctave(noteNumber)}`)
-      updateNote(sequenceId, stepId, noteId, { note: [newNoteNumber, otherNoteValue] })
-    }
+    const newNoteNumber = noteToMidi(`${event.target.value}${noteNumberToOctave(noteNumber)}`)
+    updateNote(sequenceId, stepId, noteId, { note: [newNoteNumber, otherNoteValue] })
   }
 
   const handleOctaveChange = (event) => {
@@ -36,6 +39,12 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }) => {
 
   const handleVelocityChange = (event) => {
     updateNote(sequenceId, stepId, noteId, { velocity: parseInt(event.target.value, 10) })
+  }
+
+  const handleTiedNoteChange = (event) => {
+    const tiedNote = !!event.target.checked
+    const newGateTime = tiedNote ? 127 : 100
+    updateNote(sequenceId, stepId, noteId, { gateTime: newGateTime })
   }
 
   const handleGateTimeChange = (event) => {
@@ -49,8 +58,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }) => {
         aria-label="Trigger Note"
         type="checkbox"
         checked={note.trigger}
-        onChange={(e) => console.log("Trigger: ", e.target.checked)}
-        disabled={!note.on}
+        onChange={handleTriggerChange}
       />
       <select
         aria-label="Note"
@@ -82,18 +90,22 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }) => {
         onChange={handleVelocityChange}
         disabled={disabled}
       />
-      {/* Make this 0-100 and a checkbox to 'tie' the note */}
       <input
         aria-label="Gate Time"
         type="number"
         min="0"
         max="127"
-        defaultValue={gateTime}
+        value={gateTime}
         onChange={handleGateTimeChange}
-        disabled={disabled}
+        disabled={disabled || tiedNote}
       />
-      <p className="noteData">Note Data: {gateTime}</p>
-      <p className="noteMotionData">Motion Data: {JSON.stringify(note.motionData)}</p>
+      <input
+        aria-label="Tie Note"
+        type="checkbox"
+        checked={tiedNote}
+        onChange={handleTiedNoteChange}
+      />
+      <p className="noteMotionData">Motion Data: {JSON.stringify(motionData)}</p>
     </div>
   )
 }

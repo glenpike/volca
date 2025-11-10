@@ -20,6 +20,15 @@ export const GATE_TIME_LOOKUP = [
   "100", "100", "100", "100", "100", "100", "100", "127"
 ]
 
+export const adjustNoteData = (data) => {
+  let { gateTime } = data
+  console.log('adjustNoteData', gateTime)
+  if(gateTime && gateTime > 100 && gateTime < 127) {
+    gateTime = 127
+  }
+  return { ...data, gateTime }
+}
+
 export const parseStepBytes = (bytes) => {
   if (bytes.length < 112) {
     throw new Error('Invalid MIDI step data length. Expected 112 bytes, received ' + bytes.length);
