@@ -113,10 +113,11 @@ export interface SequenceReserved {
   reserved1888_1915: ByteArray; // 27 bytes
 }
 
+export type SequenceMotionValues = Record<MotionParamName, number>
 // Motion data at sequence level
 export interface SequenceMotionData {
-  switches: Array<Record<MotionParamName, number>>; // 16 steps worth of switches
-  motion: Record<MotionParamName, number>; // Motion parameter values
+  switches: Array<SequenceMotionValues>; // 16 steps worth of switches
+  motion: SequenceMotionValues; // Motion parameter values
 }
 
 // Complete Sequence interface
