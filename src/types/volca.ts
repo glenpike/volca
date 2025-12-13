@@ -2,12 +2,9 @@
  * Shared TypeScript types for Volca sequencer data structures
  */
 
-
-// Add to your types file
 export type ByteArray = Uint8Array;
 export type ByteBuffer = number[]; // For compatibility with existing code
 
-// Specific byte array types for your use case
 export type SettingsBytes = Uint8Array; // 6 bytes
 export type StepBytes = Uint8Array;     // 112 bytes  
 export type SequenceBytes = Uint8Array; // 1920 bytes
@@ -72,11 +69,11 @@ export type ToggleSwitchNames =
   | 'reverb'
 
 // Individual Note interface
-export interface Note {
+export interface NoteInfo {
   id: number;
   note: [number, number]; // [noteNumber, otherNoteValue] - MIDI note data
   velocity: number; // 0-127
-  gateTime: string | number; // Gate time value, can be string from lookup or number
+  gateTime: string | number; // FIXME!! Gate time value, can be string from lookup or number
   trigger: boolean; // Whether this note is triggered
 }
 
@@ -107,12 +104,12 @@ export interface SequenceSettings {
 }
 
 // Individual Step interface
-export interface Step {
+export interface StepInfo {
   id: number;
   on: boolean; // Step on/off status
   active: boolean; // Step active status
   motionFuncTranspose: boolean; // Motion function transpose on/off
-  notes: Note[]; // Array of up to 6 notes per step
+  notes: NoteInfo[]; // Array of up to 6 notes per step
   motionData: MotionData; // Motion parameter data for this step
   reserved30: ByteArray; // Reserved bytes 30-41 (12 bytes)
   reserved108: ByteArray; // Reserved bytes 108-111 (4 bytes)
@@ -135,47 +132,29 @@ export interface SequenceMotionData {
 }
 
 // Complete Sequence interface
-export interface Sequence {
+export interface SequenceInfo {
   numberOfSteps: number; // Number of steps in sequence (typically 16)
   programNumber: number; // Program/sequence number
   motionData: SequenceMotionData; // Sequence-level motion data
   sequenceSettings: SequenceSettings; // Global sequence settings
-  steps: Step[]; // Array of step data
+  steps: StepInfo[]; // Array of step data
   reserved: SequenceReserved; // Reserved/unused bytes
 }
-
-// Props interfaces for React components
-// export interface NoteProps {
-//   noteId: number;
-//   sequenceId: number;
-//   stepId: number;
-//   on: boolean;
-//   motionData: any; // Could be more specific if needed
-// }
-
-// export interface StepProps {
-//   step: Step;
-//   sequenceId?: number;
-// }
-
-// export interface SequenceProps {
-//   sequence: Sequence;
-// }
 
 // Store state interface
 export interface VolcaStoreState {
   currentSequenceNumber: number | null;
-  sequences: Sequence[];
+  sequences: SequenceInfo[];
   setCurrentSequenceNumber: (number: number) => void;
-  getSequence: (number: number) => Sequence | null;
+  getSequence: (number: number) => SequenceInfo | null;
   clearSequences: () => void;
-  addOrUpdateSequence: (sequence: Sequence) => void;
-  updateNote: (sequenceId: number, stepId: number, noteId: number, updatedData: Partial<Note>) => void;
+  addOrUpdateSequence: (sequence: SequenceInfo) => void;
+  updateNote: (sequenceId: number, stepId: number, noteId: number, updatedData: Partial<NoteInfo>) => void;
 }
 
 // Utility types for parsing functions
 export interface ParsedStepData {
-  notes: Note[];
+  notes: NoteInfo[];
   motionData: MotionData;
   reserved30: ByteArray;
   reserved108: ByteArray;
