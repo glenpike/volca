@@ -3,7 +3,15 @@ import { useVolcaStore } from '../../stores/useVolcaStore'
 import { noteNumberToName, noteNumberToOctave, musicalNotes, noteToMidi } from '../../utils/MidiNotes'
 import './Note.css'
 
-const Note = ({ noteId, sequenceId, stepId, on, motionData }) => {
+interface NoteProps {
+  noteId: number;
+  sequenceId: number;
+  stepId: number;
+  on: boolean;
+  motionData: any;
+}
+
+const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
   const note = useVolcaStore((state) =>
     state.sequences
       .find((seq) => seq.programNumber === sequenceId)
@@ -16,7 +24,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }) => {
   if (!note) {
     return null
   }
-  
+
   const { trigger, note: [noteNumber, otherNoteValue], velocity, gateTime } = note
   const disabled = !(on && trigger)
   const noteOptions = [...musicalNotes]
