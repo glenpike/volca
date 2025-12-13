@@ -2,6 +2,29 @@
  * Shared TypeScript types for Volca sequencer data structures
  */
 
+// Constants
+export const MOTION_PARAM_NAMES = [
+  'transpose', 'velocity', 'algorithm', 'modulatorAttack', 'modulatorDecay',
+  'carrierAttack', 'carrierDecay', 'lfoRate', 'lfoPitchDepth', 'arpType',
+  'arpDiv', 'chorusDepth', 'reverbDepth'
+];
+
+export const ARP_TYPES = [
+  'OFF', 'RISE 1', 'RISE 2', 'RISE 3', 'FALL 1', 'FALL 2', 'FALL 3',
+  'RAND 1', 'RAND 2', 'RAND 3'
+];
+
+export const ARP_DIVISIONS = [
+  '1/12 STEP', '1/8 STEP', '1/4 STEP', '1/3 STEP', '1/2 STEP',
+  '2/3 STEP', '1/1 STEP', '3/2 STEP', '2/1 STEP', '3/1 STEP',
+  '4/1 STEP'
+];
+
+export const MOTION_SWITCH_NAMES = ['onOff', 'smooth', 'warpActiveStep', 'tempo1', 'tempo', 'voiceMono', 'voiceUnison', 'chorus']
+export const TOGGLE_SWITCH_NAMES = ['arp', 'transposeNote', 'reverb']
+export const TEMPO_VALUES = ['1/1', '1/2', '1/4'];
+
+// Basic types for documentation / abstraction
 export type ByteArray = Uint8Array;
 export type ByteBuffer = number[]; // For compatibility with existing code
 
@@ -10,63 +33,28 @@ export type StepBytes = Uint8Array;     // 112 bytes
 export type SequenceBytes = Uint8Array; // 1920 bytes
 
 // Motion parameter names as defined in parseMotion.js
-export type MotionParamName =
-  | 'transpose'
-  | 'velocity'
-  | 'algorithm'
-  | 'modulatorAttack'
-  | 'modulatorDecay'
-  | 'carrierAttack'
-  | 'carrierDecay'
-  | 'lfoRate'
-  | 'lfoPitchDepth'
-  | 'arpType'
-  | 'arpDiv'
-  | 'chorusDepth'
-  | 'reverbDepth';
+type MotionParamNameTuple = typeof MOTION_PARAM_NAMES;
+export type MotionParamName = MotionParamNameTuple[number];
 
 // Arpeggiator types
-export type ArpType =
-  | 'OFF'
-  | 'RISE 1'
-  | 'RISE 2'
-  | 'RISE 3'
-  | 'FALL 1'
-  | 'FALL 2'
-  | 'FALL 3'
-  | 'RAND 1'
-  | 'RAND 2'
-  | 'RAND 3';
+type ArpTypeTuple = typeof ARP_TYPES;
+export type ArpType = ArpTypeTuple[number];
 
-export type ArpDiv =
-  | '1/12 STEP'
-  | '1/8 STEP'
-  | '1/4 STEP'
-  | '1/3 STEP'
-  | '1/2 STEP'
-  | '2/3 STEP'
-  | '1/1 STEP'
-  | '3/2 STEP'
-  | '2/1 STEP'
-  | '3/1 STEP'
-  | '4/1 STEP';
+// Arpeggiator divisions
+type ArpDivTuple = typeof ARP_DIVISIONS;
+export type ArpDiv = ArpDivTuple[number];
 
-export type Tempo = '1/1' | '1/2' | '1/4';
+// Tempo values
+type TempoTuple = typeof TEMPO_VALUES;
+export type Tempo = TempoTuple[number];
 
-export type MotionSwitchNames =
-  | 'onOff'
-  | 'smooth'
-  | 'warpActiveStep'
-  | 'tempo1'
-  | 'tempo'
-  | 'voiceMono'
-  | 'voiceUnison'
-  | 'chorus'
+// Motion switch names
+type MotionSwitchNamesTuple = typeof MOTION_SWITCH_NAMES;
+export type MotionSwitchNames = MotionSwitchNamesTuple[number];
 
-export type ToggleSwitchNames =
-  | 'arp'
-  | 'transposeNote'
-  | 'reverb'
+// Toggle switch names
+type ToggleSwitchNamesTuple = typeof TOGGLE_SWITCH_NAMES;
+export type ToggleSwitchNames = ToggleSwitchNamesTuple[number];
 
 // Individual Note interface
 export interface NoteInfo {
@@ -165,24 +153,3 @@ export interface PackedMotionData {
   switchBytes: ByteArray;
 }
 
-// Constants
-export const MOTION_PARAM_NAMES: MotionParamName[] = [
-  'transpose', 'velocity', 'algorithm', 'modulatorAttack', 'modulatorDecay',
-  'carrierAttack', 'carrierDecay', 'lfoRate', 'lfoPitchDepth', 'arpType',
-  'arpDiv', 'chorusDepth', 'reverbDepth'
-];
-
-export const ARP_TYPES: ArpType[] = [
-  'OFF', 'RISE 1', 'RISE 2', 'RISE 3', 'FALL 1', 'FALL 2', 'FALL 3',
-  'RAND 1', 'RAND 2', 'RAND 3'
-];
-
-export const ARP_DIVISIONS: ArpDiv[] = [
-  '1/12 STEP', '1/8 STEP', '1/4 STEP', '1/3 STEP', '1/2 STEP',
-  '2/3 STEP', '1/1 STEP', '3/2 STEP', '2/1 STEP', '3/1 STEP',
-  '4/1 STEP'
-];
-
-export const TEMPO_VALUES: Tempo[] = ['1/1', '1/2', '1/4'];
-export const MOTION_SWITCH_NAMES: MotionSwitchNames[] = ['onOff', 'smooth', 'warpActiveStep', 'tempo1', 'tempo', 'voiceMono', 'voiceUnison', 'chorus']
-export const TOGGLE_SWITCH_NAMES: ToggleSwitchNames[] = ['arp', 'transposeNote', 'reverb']
