@@ -6,11 +6,10 @@ describe('Step Component', () => {
   const mockStepData = {
     id: 0,
     on: true,
-    active: true,
     notes: [
-      { id: 0, note: [60], velocity: 100, gateTime: 0.5, trigger: true },
-      { id: 1, note: [48], velocity: 80, gateTime: 0.7, trigger: true },
-      { id: 2, note: [72], velocity: 60, gateTime: 0.4, trigger: true },
+      { id: 0, note: [60], velocity: 100, gateTime: "50", trigger: true },
+      { id: 1, note: [48], velocity: 80, gateTime: "70", trigger: true },
+      { id: 2, note: [72], velocity: 60, gateTime: "40", trigger: true },
     ],
     motionData: {},
     motionFuncTranspose: false
