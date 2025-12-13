@@ -7,9 +7,9 @@ describe('Settings', () => {
     const settings = parseSettingsBytes(sequenceSettingsBytes)
     expect(JSON.stringify(settings)).toEqual(JSON.stringify(sequenceSettings))
   });
-  
+
   test('Converts to bytes correctly', () => {
     const settingsBytes = packSettingsData(sequenceSettings)
-    expect(settingsBytes).toEqual(sequenceSettingsBytes)
+    expect(settingsBytes).toEqual(Uint8Array.from(sequenceSettingsBytes))
   });
 })
