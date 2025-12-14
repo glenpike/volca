@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
-import VolcaFMContext from '../../contexts/VolcaFMContext.js'
-import { bytesToHex } from '../../utils/utils.js'
-import WebMidiContext from '../../contexts/WebMidiContext.js'
+import VolcaFMContext from '../../contexts/VolcaFMContext'
+import { bytesToHex } from '../../utils/utils'
+import WebMidiContext from '../../contexts/WebMidiContext'
 
 const SequenceDebug = () => {
 	const {
@@ -14,7 +14,7 @@ const SequenceDebug = () => {
 
 	const [currentDump, setCurrentDump] = useState('')
 	const handleDumpSysex = () => {
-		
+
 		setCurrentDump(bytesToHex(lastRxSysexMessage))
 	}
 
@@ -22,13 +22,13 @@ const SequenceDebug = () => {
 		setCurrentDump(JSON.stringify(currentSequence))
 	}
 
-	if(!currentSequence || !currentSequence?.steps?.length) {
-    return (
-      <p>Load a sequence</p>
-    )
-  }
+	if (!currentSequence || !currentSequence?.steps?.length) {
+		return (
+			<p>Load a sequence</p>
+		)
+	}
 
-  return (
+	return (
 		<fieldset className="group-control">
 			<legend>Debug</legend>
 			<div className="message-display">
@@ -45,8 +45,8 @@ const SequenceDebug = () => {
 			</div>
 			<button onClick={handleDumpSysex}>Dump Sysex</button>
 			<button onClick={handleDumpJSON}>Dump JSON</button>
-    </fieldset>
-  )
+		</fieldset>
+	)
 }
 
 export default SequenceDebug

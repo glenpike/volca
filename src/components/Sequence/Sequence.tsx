@@ -3,32 +3,33 @@ import VolcaFMContext from '../../contexts/VolcaFMContext'
 import { useVolcaStore } from '../../stores/useVolcaStore'
 import Step from '../Step/Step'
 import './Sequence.css';
+import { SequenceInfo, StepInfo } from '../../types'
 
 const Sequence = () => {
   const {
     webMidiContext
-	} = useContext(VolcaFMContext)
-  
+  } = useContext(VolcaFMContext)
+
   const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
   console.log('Sequence currentSequenceNumber', currentSequenceNumber)
-  const currentSequence = useVolcaStore(state => state.sequences.find((seq) => seq.programNumber === currentSequenceNumber))
-  
+  const currentSequence = useVolcaStore(state => state.sequences.find((seq: SequenceInfo) => seq.programNumber === currentSequenceNumber))
+
   const {
     midiInitialised,
-	} = webMidiContext
+  } = webMidiContext!
 
-  if(!midiInitialised) {
+  if (!midiInitialised) {
     return null
   }
 
-  if(!currentSequence || !currentSequence?.steps?.length) {
+  if (!currentSequence || !currentSequence?.steps?.length) {
     return (
       <p>Load a sequence</p>
     )
   }
 
-  const steps = currentSequence.steps.map((step, index) =>
-    <li className="sequence-step" key={index}><Step step={step} sequenceId={currentSequence.programNumber}/></li>
+  const steps = currentSequence.steps.map((step: StepInfo, index: number) =>
+    <li className="sequence-step" key={index}><Step step={step} sequenceId={currentSequence.programNumber} /></li>
   )
 
   return (
