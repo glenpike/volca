@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Step from './Step';
 
 describe('Step Component', () => {
@@ -22,19 +22,19 @@ describe('Step Component', () => {
   });
 
   it('displays the correct step number', () => {
-    const { getByText } = render(<Step step={mockStepData} />);
-    expect(getByText('1')).toBeInTheDocument();
+    render(<Step step={mockStepData} />);
+    expect(screen.getByText('1')).toBeInTheDocument();
   });
 
   it('displays the correct checkbox state for "Step On"', () => {
-    const { getByLabelText } = render(<Step step={mockStepData} />);
-    const checkbox = getByLabelText('Step On:');
+    render(<Step step={mockStepData} />);
+    const checkbox = screen.getByLabelText('Step On:');
     expect(checkbox.checked).toBe(true);
   });
 
   it('renders the correct number of notes', () => {
-    const { container } = render(<Step step={mockStepData} />);
-    const notes = container.querySelectorAll('.step-note');
+    render(<Step step={mockStepData} />);
+    const notes = screen.getAllByRole('listitem');
     expect(notes.length).toBe(3);
   });
 });

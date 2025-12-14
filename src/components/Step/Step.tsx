@@ -1,11 +1,16 @@
 import React from 'react'
 import Note from '../Note/Note'
 import './Step.css';
+import { StepInfo } from '../../types'
 
+interface StepProps {
+  step: StepInfo;
+  sequenceId: number;
+}
 
-const Step = ({ step, sequenceId }) => {
-  const { id, on, notes = [], motionData = []} = step
-  
+const Step = ({ step, sequenceId }: StepProps) => {
+  const { id, on, notes = [], motionData = [] } = step
+
   const noteComponents = notes.map((note) => {
     return (
       <li className="step-note" key={`${id}_${note.id}`}>

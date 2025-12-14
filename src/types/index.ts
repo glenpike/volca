@@ -4,3 +4,4 @@
  */
 
 export * from './volca';
+export * from './webmidi';
