@@ -3,21 +3,16 @@ import { bytesToHex, hexToBytes } from '../utils/utils'
 import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
 import { parseSequenceBytes } from '../utils/Volca/parseSequence'
 import { useVolcaStore } from '../stores/useVolcaStore'
-import { shallow } from 'zustand/shallow'
 
 import { VolcaFMContextType, MidiContextType } from '../types'
 
-const deviceInquiryRequest = '0x0c, 0x06, 0x01'
-
-const searchDeviceRequest = [0x50, 0x00, 0x77]
-
-const currentSeqDumpRequest = [0x00, 0x01, 0x2F, 0x10]
-const seqDumpRequest = '0x00, 0x01, 0x2F, 0x1C, 0x0s'
-
-const exclusiveHeaderReply = [0x00, 0x01, 0x02F]//??
-
-const sequenceSendRequest = '0x00, 0x01, 0x2F, 0x4C, 0x0s'
-const currentSequenceSendRequest = [0x00, 0x01, 0x2F, 0x40]
+// const exclusiveHeaderReply = '0x00, 0x01, 0x02F' //unused
+// const searchDeviceRequest = '0x50, 0x00, 0x77'
+const deviceInquiryRequest = '0x0%{channel}, 0x06, 0x01'
+const currentSeqDumpRequest = '0x00, 0x01, 0x2F, 0x10'
+const seqDumpRequest = '0x00, 0x01, 0x2F, 0x1C, 0x0%{sequenceNumber}'
+const sequenceSendRequest = '0x00, 0x01, 0x2F, 0x4C, 0x0%{sequenceNumber}'
+// const currentSequenceSendRequest = '0x00, 0x01, 0x2F, 0x40'
 
 const VolcaFMContext = createContext<VolcaFMContextType>(
   {
@@ -56,7 +51,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
 
   const deviceInquiry = () => {
     console.log('VolcaFMContextProvider deviceInquiry - sending deviceInquiryRequest')
-    const request = hexToBytes(deviceInquiryRequest.replace('c', currentChannel.toString()))
+    const request = hexToBytes(deviceInquiryRequest.replace('%{channel}', currentChannel.toString()))
     sendUniversalMessage(0x7e, request)
   }
 
@@ -87,13 +82,13 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
   const loadSequenceNumber = (number: number) => {
     setCurrentSequenceNumber(-1)
     const seqNumber = Number(number - 1).toString(16)
-    const request = hexToBytes(seqDumpRequest.replace('s', seqNumber))
+    const request = hexToBytes(seqDumpRequest.replace('%{sequenceNumber}', seqNumber))
     sendSysexMessage([_channelHex()].concat(request))
   }
 
   const loadCurrentSequence = () => {
     setCurrentSequenceNumber(-1)
-    sendSysexMessage([_channelHex()].concat(currentSeqDumpRequest))
+    sendSysexMessage([_channelHex()].concat(hexToBytes(currentSeqDumpRequest)))
   }
 
   // Do we want to do this?
@@ -105,7 +100,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
   //     return
   //   }
   //   const data = convert8to7bit(currentSequence.toBytes())
-  //   const message = [_channelHex()].concat(currentSequenceSendRequest, data)
+  //   const message = [_channelHex()].concat(hexToBytes(currentSequenceSendRequest), data)
   //   console.log('saving current sequence ', bytesToHex(message))
   //   sendSysexMessage(message)
   // }
@@ -120,7 +115,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
 
     const seqNumber = Number(number - 1).toString(16)
     const data = convert8to7bit(sequence.toBytes())
-    const request = hexToBytes(sequenceSendRequest.replace('s', seqNumber))
+    const request = hexToBytes(sequenceSendRequest.replace('%{sequenceNumber}', seqNumber))
     const message = [_channelHex()].concat(request, data)
     console.log('saving sequence ', bytesToHex(message))
     sendSysexMessage(message)
