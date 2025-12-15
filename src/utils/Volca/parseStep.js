@@ -1,5 +1,4 @@
-
-import { MOTION_PARAMS } from './parseMotion';
+import { MOTION_PARAM_NAMES } from '../../types';
 
 export const GATE_TIME_LOOKUP = [
   "0", "1", "3", "4", "6", "7", "8", "10",
@@ -23,7 +22,7 @@ export const GATE_TIME_LOOKUP = [
 export const adjustNoteData = (data) => {
   let { gateTime } = data
   console.log('adjustNoteData', gateTime)
-  if(gateTime && gateTime > 100 && gateTime < 127) {
+  if (gateTime && gateTime > 100 && gateTime < 127) {
     gateTime = 127
   }
   return { ...data, gateTime }
@@ -55,8 +54,8 @@ export const parseStepBytes = (bytes) => {
     data.reserved30[i] = bytes[i + 30]
   }
 
-  for (let i = 0; i < MOTION_PARAMS.length; i++) {
-    const paramName = MOTION_PARAMS[i]
+  for (let i = 0; i < MOTION_PARAM_NAMES.length; i++) {
+    const paramName = MOTION_PARAM_NAMES[i]
     const paramValues = []
     for (let j = 0; j < 5; j++) {
       paramValues.push(bytes[43 + (i * 5) + j])
@@ -72,32 +71,32 @@ export const parseStepBytes = (bytes) => {
 }
 
 export const packStepData = (data) => {
-    const bytes = new Array(112).fill(0)
+  const bytes = new Array(112).fill(0)
 
-    for(let i = 0;i < 6;i++) {
-      bytes[i * 2] = data.notes[i].note[0] & 0xFF
-      bytes[(i * 2) + 1] = data.notes[i].note[1] & 0xFF
-      bytes[i + 18] = data.notes[i].velocity
-      bytes[24 + i] = ((data.notes[i].trigger & 1) << 7) | (GATE_TIME_LOOKUP.indexOf(data.notes[i].gateTime) & 0x7F)
-    }
-    // Reserved (Bytes 30-31): Typically not used
-    for (let i = 0;i < 12;i++) {
-      bytes[i + 30] = data.reserved30[i]
-    }
-
-    // Motion Data (Bytes 43-107)
-    for (let i = 0; i < MOTION_PARAMS.length; i++) {
-        const paramName = MOTION_PARAMS[i];
-        const paramValues = data.motionData[paramName]
-        for(let j = 0;j < 5;j++) {
-          bytes[43 + (i * 5) + j] = paramValues[j]
-        }
-    }
-
-    // Reserved (Bytes 108-111): Typically not used
-    for (let i = 0;i < 4;i++) {
-      bytes[i + 108] = data.reserved108[i]
-    }
-  
-    return bytes
+  for (let i = 0; i < 6; i++) {
+    bytes[i * 2] = data.notes[i].note[0] & 0xFF
+    bytes[(i * 2) + 1] = data.notes[i].note[1] & 0xFF
+    bytes[i + 18] = data.notes[i].velocity
+    bytes[24 + i] = ((data.notes[i].trigger & 1) << 7) | (GATE_TIME_LOOKUP.indexOf(data.notes[i].gateTime) & 0x7F)
   }
+  // Reserved (Bytes 30-31): Typically not used
+  for (let i = 0; i < 12; i++) {
+    bytes[i + 30] = data.reserved30[i]
+  }
+
+  // Motion Data (Bytes 43-107)
+  for (let i = 0; i < MOTION_PARAM_NAMES.length; i++) {
+    const paramName = MOTION_PARAM_NAMES[i];
+    const paramValues = data.motionData[paramName]
+    for (let j = 0; j < 5; j++) {
+      bytes[43 + (i * 5) + j] = paramValues[j]
+    }
+  }
+
+  // Reserved (Bytes 108-111): Typically not used
+  for (let i = 0; i < 4; i++) {
+    bytes[i + 108] = data.reserved108[i]
+  }
+
+  return bytes
+}

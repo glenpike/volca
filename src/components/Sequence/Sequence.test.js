@@ -8,9 +8,9 @@ import { unpackedData } from '../../../test/sequenceBytes'
 import { parseSequenceBytes } from '../../utils/Volca/parseSequence'
 import { mockUseVolcaStore } from '../../../test/mockUseVolcaStore'
 
-jest.mock('../Step/Step.js', () => () => <div className="step">Mock Step</div>);
+jest.mock('../Step/Step', () => () => <div className="step">Mock Step</div>);
 
-const defaultStoreState = { 
+const defaultStoreState = {
   currentSequenceNumber: null,
   sequences: [],
 }
@@ -18,7 +18,7 @@ const defaultStoreState = {
 const renderWithContext = ({ contextValue, storeState = defaultStoreState }) => {
   jest.clearAllMocks();
   mockUseVolcaStore(storeState);
-  
+
   return render(
     <VolcaFMContext.Provider value={contextValue}>
       <Sequence />
@@ -68,7 +68,7 @@ describe('Sequence Component', () => {
       sequences: [sequence],
     }
     renderWithContext({ contextValue, storeState })
-    
+
     expect(screen.getByText(/Motion data:/)).toBeInTheDocument()
   })
 })
