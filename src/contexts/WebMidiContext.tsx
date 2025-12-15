@@ -1,6 +1,7 @@
 import React, { useState, createContext } from 'react'
 import { bytesToHex } from '../utils/utils.js'
-import { WebMidiContextType } from '../types'
+import { WebMidiContextType, SentSysexMessage } from '../types'
+import { Input, Output } from 'webmidi'
 
 const sysexEnabled = true
 
@@ -30,16 +31,16 @@ interface WebMidiContextProviderProps {
 
 const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiContextProviderProps) => {
 	// console.log('WebMidi mocked?')
-	const [currentManufacturer, setManufacturer] = useState(manufacturer || 0x42)
-	const [currentOutput, _setCurrentOutput] = useState(null)
-	const [currentInput, _setCurrentInput] = useState(null)
-	const [midiOutputs, setMidiOutputs] = useState([])
-	const [midiInputs, setMidiInputs] = useState([])
+	const [currentManufacturer, setManufacturer] = useState<number>(manufacturer || 0x42)
+	const [currentOutput, _setCurrentOutput] = useState<Output | null>(null)
+	const [currentInput, _setCurrentInput] = useState<Input | null>(null)
+	const [midiOutputs, setMidiOutputs] = useState<Output[]>([])
+	const [midiInputs, setMidiInputs] = useState<Input[]>([])
 
-	const [midiInitialised, setMidiInitialised] = useState(false)
+	const [midiInitialised, setMidiInitialised] = useState<boolean>(false)
 
-	const [lastTxSysexMessage, setTxSysexMessage] = useState(null)
-	const [lastRxSysexMessage, setRxSysexMessage] = useState(null)
+	const [lastTxSysexMessage, setTxSysexMessage] = useState<SentSysexMessage | null>(null)
+	const [lastRxSysexMessage, setRxSysexMessage] = useState<Uint8Array | null>(null)
 	const [currentListener, _setCurrentListener] = useState(null)
 
 	const initialise = () => {
@@ -48,15 +49,15 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 			.enable({ sysex: sysexEnabled })
 			.then(() => {
 				console.log("WebMidi with sysex enabled!")
-				const outputsArray = []
-				const inputsArray = []
+				const outputsArray: Output[] = []
+				const inputsArray: Input[] = []
 
-				WebMidi.inputs.forEach(input => {
+				WebMidi.inputs.forEach((input: Input) => {
 					console.log(input.manufacturer, input.name)
 					inputsArray.push(input)
 				})
 
-				WebMidi.outputs.forEach(output => {
+				WebMidi.outputs.forEach((output: Output) => {
 					console.log(output.manufacturer, output.name)
 					outputsArray.push(output)
 				})
@@ -66,29 +67,29 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 				setMidiInputs(inputsArray)
 				setMidiInitialised(true)
 			})
-			.catch(err => alert(err));
+			.catch((err: any) => alert(err));
 
 	}
 
-	const setCurrentOutput = (index) => {
+	const setCurrentOutput = (index: number | null) => {
 		let output = null
-		if (index >= 0 && index < midiOutputs.length) {
+		if (index && index >= 0 && index < midiOutputs.length) {
 			output = midiOutputs[index]
 		}
 		_setCurrentOutput(output)
 	}
 
-	const getCurrentOutput = () => {
+	const getCurrentOutput = (): Output | null => {
 		if (currentOutput) {
 			return WebMidi.getOutputById(currentOutput.id)
 		}
 		return null
 	}
 
-	const setCurrentInput = (index) => {
+	const setCurrentInput = (index: number | null) => {
 		removeInputListener()
 		let input = null
-		if (index >= 0 && index < midiInputs.length) {
+		if (index && index >= 0 && index < midiInputs.length) {
 			input = midiInputs[index]
 		}
 		_setCurrentInput(input)
@@ -102,9 +103,9 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 		}
 	}
 
-	const addInputListener = (input) => {
+	const addInputListener = (input: Input | null) => {
 		if (input) {
-			const listener = WebMidi.getInputById(input.id).addListener("sysex", e => {
+			const listener = WebMidi.getInputById(input.id).addListener("sysex", (e: any) => {
 				// console.log(`sysex:`, e);
 
 				// Validate and remove f0 / f7 head/tail?
@@ -123,7 +124,7 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 		}
 	}
 
-	const getCurrentInput = () => {
+	const getCurrentInput = (): Input | null => {
 		if (currentInput) {
 			return WebMidi.getInputById(currentInput.id)
 		}
@@ -135,7 +136,7 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 		if (output) {
 			console.log(`tx sysex: ${bytesToHex(data)}`)
 			try {
-				setTxSysexMessage({ currentManufacturer, data })
+				setTxSysexMessage({ manufacturer: currentManufacturer, data })
 				output.sendSysex(currentManufacturer, data)
 			} catch (RangeError) {
 				console.log(`RangeError for: ${data}`)
@@ -143,13 +144,13 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 		}
 	}
 
-	const sendUniversalMessage = (identification: number, data: Uint8Array) => {
+	const sendUniversalMessage = (manufacturer: number, data: Uint8Array) => {
 		const output = getCurrentOutput()
 		if (output) {
-			console.log(`sending universal message: ${bytesToHex([identification])} ${bytesToHex(data)}`)
+			console.log(`sending universal message: ${bytesToHex([manufacturer])} ${bytesToHex(data)}`)
 			try {
-				setTxSysexMessage({ identification, data })
-				output.sendSysex(identification, data)
+				setTxSysexMessage({ manufacturer, data })
+				output.sendSysex(manufacturer, data)
 			} catch (RangeError) {
 				console.log(`RangeError for: ${data}`)
 			}

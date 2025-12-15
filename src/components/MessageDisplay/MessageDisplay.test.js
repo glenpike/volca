@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import MessageDisplay from './MessageDisplay.js'
-import WebMidiContext from '../../contexts/WebMidiContext.js'
+import WebMidiContext from '../../contexts/WebMidiContext'
 
 describe('MessageDisplay', () => {
 	const provider = {
@@ -34,7 +34,7 @@ describe('MessageDisplay', () => {
 		beforeAll(() => {
 			provider.lastSysexMessage = { manufacturer: 0xaa, data: [1, 2, 3, 4, 5, 6] }
 			console.log('beforeAll', provider)
-			
+
 		})
 		afterAll(() => {
 			provider.lastSysexMessage = null

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import WebMidiContext from '../../contexts/WebMidiContext.js'
+import WebMidiContext from '../../contexts/WebMidiContext'
 
 
 import './MessageDisplay.css'
@@ -14,7 +14,7 @@ const MessageDisplay = () => {
 	const { manufacturer = '', txData = [] } = lastTxSysexMessage || {}
 
 	const txMessageStr = () => {
-		if(0 == txData.length) {
+		if (0 == txData.length) {
 			return ''
 		}
 
@@ -24,7 +24,7 @@ const MessageDisplay = () => {
 	const { rxData = [] } = lastRxSysexMessage || {}
 
 	const rxMessageStr = () => {
-		if(0 == rxData.length) {
+		if (0 == rxData.length) {
 			return ''
 		}
 
@@ -35,7 +35,7 @@ const MessageDisplay = () => {
 		<fieldset className="group-control">
 			<legend>Debug</legend>
 			<div className="message-display">
-				<textarea 
+				<textarea
 					className="message-display__textarea"
 					id="message-display-output"
 					rows="4"
@@ -46,7 +46,7 @@ const MessageDisplay = () => {
 				</label>
 			</div>
 			<div className="message-display">
-				<textarea 
+				<textarea
 					className="message-display__textarea"
 					id="message-display-output"
 					rows="4"
