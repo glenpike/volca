@@ -17,16 +17,16 @@ const exclusiveHeaderReply = [0x00, 0x01, 0x02F]//??
 const sequenceSendRequest = '0x00, 0x01, 0x2F, 0x4C, 0x0s'
 const currentSequenceSendRequest = [0x00, 0x01, 0x2F, 0x40]
 
- const VolcaFMContext = React.createContext(
-{
-  deviceInquiry: () => {},
-  currentChannel: null,
-	setCurrentChannel: () => {},
-  loadSequenceNumber: (n) => {},
-  saveSequenceNumber: (n) => {},
-  loadCurrentSequence: () => {},
-  webMidiContext: null,
-}
+const VolcaFMContext = React.createContext(
+  {
+    deviceInquiry: () => { },
+    currentChannel: null,
+    setCurrentChannel: () => { },
+    loadSequenceNumber: (n) => { },
+    saveSequenceNumber: (n) => { },
+    loadCurrentSequence: () => { },
+    webMidiContext: null,
+  }
 )
 
 const UNKNOWN_MESSAGE = 'unknown-message'
@@ -35,7 +35,7 @@ const CURRENT_SEQUENCE_DUMP = 'current-sequence-dump'
 
 const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   const {
-		lastRxSysexMessage,
+    lastRxSysexMessage,
     sendSysexMessage,
     sendUniversalMessage,
   } = injectedMidiContext;
@@ -51,9 +51,9 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   const setCurrentSequenceNumber = useVolcaStore((state) => state.setCurrentSequenceNumber);
   const addOrUpdateSequence = useVolcaStore((state) => state.addOrUpdateSequence);
   const getSequence = useVolcaStore(state => state.getSequence)
-    
+
   const [currentChannel, _setCurrentChannel] = useState(channel - 1)
-  
+
   const deviceInquiry = () => {
     console.log('VolcaFMContextProvider deviceInquiry - sending deviceInquiryRequest')
     const request = hexToBytes(deviceInquiryRequest.replace('c', currentChannel))
@@ -61,22 +61,21 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   }
 
   const setCurrentChannel = (channel) => {
-		if (channel >= 0 && channel < 16) {
-			_setCurrentChannel(channel)
-		}
-	}
+    if (channel >= 0 && channel < 16) {
+      _setCurrentChannel(channel)
+    }
+  }
 
   useEffect(() => {
-    if(lastRxSysexMessage && lastRxSysexMessage.length) {
-      
-      const firstByte = lastRxSysexMessage.shift()
-      if(firstByte == 0x42) {
-        console.log('Korg message for us ', lastRxSysexMessage)
-        parseKorgMessage(lastRxSysexMessage)
-      } else if(firstByte == 0x7e) {
-        parseUniversalMessage(lastRxSysexMessage)
+    if (lastRxSysexMessage && lastRxSysexMessage.length) {
+      const [firstByte, ...sysexMessage] = lastRxSysexMessage
+      if (firstByte == 0x42) {
+        console.log('Korg message for us ', sysexMessage)
+        parseKorgMessage(sysexMessage)
+      } else if (firstByte == 0x7e) {
+        parseUniversalMessage(sysexMessage)
       } else {
-        console.log('Unknown message for us ', bytesToHex(lastRxSysexMessage))
+        console.log('Unknown message for us ', bytesToHex(sysexMessage))
       }
     }
   }, [lastRxSysexMessage])
@@ -114,11 +113,11 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   const saveSequenceNumber = (number) => {
     //Get it from the store!!!
     const sequence = getSequence(number)
-    if(!sequence) {
+    if (!sequence) {
       console.log(`No sequence ${number} to save`)
       return
     }
-    
+
     const seqNumber = Number(number - 1).toString(16)
     const data = convert8to7bit(sequence.toBytes())
     const request = hexToBytes(sequenceSendRequest.replace('s', seqNumber))
@@ -130,13 +129,13 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   const parseUniversalMessage = (sysexMessage) => {
     const message = [...sysexMessage]
     const channel = message.shift() & 0x0f
-    if(channel != currentChannel) {
+    if (channel != currentChannel) {
       console.log(`parseUniversalMessage Error Channel ${channel} is not for us ${currentChannel}`)
       return
     }
 
     const byteStr = JSON.stringify(message.slice(0, 4))
-    switch(byteStr) {
+    switch (byteStr) {
       case JSON.stringify([6, 2, 66, 47]):
         console.log('Device Inquiry Reply ', bytesToHex(message))
         break
@@ -148,14 +147,14 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   const parseKorgMessage = (sysexMessage) => {
     const message = [...sysexMessage]
     const channel = message.shift() & 0x0f
-    if(channel != currentChannel) {
+    if (channel != currentChannel) {
       console.log(`Parse Error Channel ${channel} is not for us ${currentChannel}`)
       return
     }
 
     // Refactor this to be better
     const byteStr = JSON.stringify(message.slice(0, 4))
-    switch(byteStr) {
+    switch (byteStr) {
       case JSON.stringify([0, 1, 47, 76]):
         console.log('Parsing Sequence ')
         parseNumberedSequence(message.slice(4))
@@ -164,13 +163,13 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
         console.log('Parsing Current Sequence ')
         parseCurrentSequence(message.slice(4))
         break
-      case JSON.stringify([0,1,47,35]):
+      case JSON.stringify([0, 1, 47, 35]):
         console.log('DATA LOAD COMPLETED')
         break
-      case JSON.stringify([0,1,47,36]):
+      case JSON.stringify([0, 1, 47, 36]):
         console.log('DATA LOAD ERROR')
         break
-      case JSON.stringify([0,1,47,38]):
+      case JSON.stringify([0, 1, 47, 38]):
         console.log('DATA FORMAT ERROR')
         break
       default:
@@ -182,11 +181,11 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     const sequenceNumber = sequenceBytes.shift()
     console.log('parseNumberedSequence ', sequenceNumber)
     const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
-    
+
     addOrUpdateSequence(sequence)
     setCurrentSequenceNumber(sequence.programNumber)
   }
-  
+
   const parseCurrentSequence = (sequenceBytes) => {
     const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
     addOrUpdateSequence(sequence)
@@ -202,12 +201,12 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     loadCurrentSequence,
     webMidiContext: injectedMidiContext,
   }
-  
+
   return (
-		<VolcaFMContext.Provider value={volcaFMContextValue}>
-			{children}
-		</VolcaFMContext.Provider>
-	)
+    <VolcaFMContext.Provider value={volcaFMContextValue}>
+      {children}
+    </VolcaFMContext.Provider>
+  )
 }
 
 export default VolcaFMContext
