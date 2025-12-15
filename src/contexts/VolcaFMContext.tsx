@@ -5,6 +5,7 @@ import { parseSequenceBytes } from '../utils/Volca/parseSequence'
 import { useVolcaStore } from '../stores/useVolcaStore'
 
 import { VolcaFMContextType, MidiContextType } from '../types'
+import VolcaFMContextError from '../errors/VolcaFMContextError'
 
 // const exclusiveHeaderReply = '0x00, 0x01, 0x02F' //unused
 // const searchDeviceRequest = '0x50, 0x00, 0x77'
@@ -43,8 +44,8 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     sendUniversalMessage,
   } = injectedMidiContext;
 
-  const setCurrentSequenceNumber = useVolcaStore((state) => state.setCurrentSequenceNumber);
-  const addOrUpdateSequence = useVolcaStore((state) => state.addOrUpdateSequence);
+  const setCurrentSequenceNumber = useVolcaStore(state => state.setCurrentSequenceNumber);
+  const addOrUpdateSequence = useVolcaStore(state => state.addOrUpdateSequence);
   const getSequence = useVolcaStore(state => state.getSequence)
 
   const [currentChannel, _setCurrentChannel] = useState<number>(channel - 1)
@@ -61,6 +62,11 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     }
   }
 
+  const throwError = (message: string) => {
+    console.log(message)
+    throw new VolcaFMContextError(message)
+  }
+
   useEffect(() => {
     if (lastRxSysexMessage && lastRxSysexMessage.length > 1) {
       const [firstByte, ...sysexMessage]: Array<number> = Array.from(lastRxSysexMessage)
@@ -70,7 +76,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
       } else if (firstByte == 0x7e) {
         parseUniversalMessage(sysexMessage)
       } else {
-        console.log('Unknown message for us ', bytesToHex(sysexMessage))
+        throwError(`Unknown message for us ${bytesToHex(sysexMessage)}`)
       }
     }
   }, [lastRxSysexMessage])
@@ -109,8 +115,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     //Get it from the store!!!
     const sequence = getSequence(number)
     if (!sequence) {
-      console.log(`No sequence ${number} to save`)
-      return
+      throwError(`No sequence loaded for ${number} to save`)
     }
 
     const seqNumber = Number(number - 1).toString(16)
@@ -125,8 +130,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     const [channelByte, ...message]: Array<number> = sysexMessage
     const channel = channelByte & 0x0f
     if (channelByte == undefined || channel != currentChannel) {
-      console.log(`parseUniversalMessage Error Channel ${channel} is not for us ${currentChannel}`)
-      return
+      throwError(`parseUniversalMessage Error Channel ${channelByte} is not for us ${currentChannel}`)
     }
 
     const byteStr = JSON.stringify(message.slice(0, 4))
@@ -143,8 +147,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     const [channelByte, ...message]: Array<number> = sysexMessage
     const channel = channelByte & 0x0f
     if (channelByte == undefined || channel != currentChannel) {
-      console.log(`Parse Error Channel ${channel} is not for us ${currentChannel}`)
-      return
+      throwError(`Parse Error Channel ${channelByte} is not for us ${currentChannel}`)
     }
 
     // Refactor this to be better
@@ -162,13 +165,13 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
         console.log('DATA LOAD COMPLETED')
         break
       case JSON.stringify([0, 1, 47, 36]):
-        console.log('DATA LOAD ERROR')
+        throwError(`DATA LOAD ERROR ${message}`)
         break
       case JSON.stringify([0, 1, 47, 38]):
-        console.log('DATA FORMAT ERROR')
+        throwError(`DATA FORMAT ERROR ${message}`)
         break
       default:
-        console.log('Cannot handle message ', byteStr)
+        throwError(`Cannot handle Korg Message type: ${byteStr}`)
     }
   }
 
