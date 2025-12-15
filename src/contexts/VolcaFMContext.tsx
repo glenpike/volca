@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, createContext } from 'react'
 import { bytesToHex, hexToBytes } from '../utils/utils'
 import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
 import { parseSequenceBytes } from '../utils/Volca/parseSequence'
 import { useVolcaStore } from '../stores/useVolcaStore'
 import { shallow } from 'zustand/shallow'
+
+import { VolcaFMContextType, MidiContextType } from '../types'
 
 const deviceInquiryRequest = '0x0c, 0x06, 0x01'
 
@@ -17,13 +19,13 @@ const exclusiveHeaderReply = [0x00, 0x01, 0x02F]//??
 const sequenceSendRequest = '0x00, 0x01, 0x2F, 0x4C, 0x0s'
 const currentSequenceSendRequest = [0x00, 0x01, 0x2F, 0x40]
 
-const VolcaFMContext = React.createContext(
+const VolcaFMContext = createContext<VolcaFMContextType>(
   {
     deviceInquiry: () => { },
-    currentChannel: null,
-    setCurrentChannel: () => { },
-    loadSequenceNumber: (n) => { },
-    saveSequenceNumber: (n) => { },
+    currentChannel: 0,
+    setCurrentChannel: (channel: number) => { },
+    loadSequenceNumber: (sequenceNumber: number) => { },
+    saveSequenceNumber: (sequenceNumber: number) => { },
     loadCurrentSequence: () => { },
     webMidiContext: null,
   }
@@ -33,42 +35,40 @@ const UNKNOWN_MESSAGE = 'unknown-message'
 const SEQUENCE_DUMP = 'sequence-dump'
 const CURRENT_SEQUENCE_DUMP = 'current-sequence-dump'
 
-const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
+interface VolcaFMContextProviderProps {
+  children: React.ReactNode;
+  channel: number;
+  injectedMidiContext: MidiContextType;
+}
+
+const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: VolcaFMContextProviderProps) => {
   const {
     lastRxSysexMessage,
     sendSysexMessage,
     sendUniversalMessage,
   } = injectedMidiContext;
 
-  // Throws errors in testing
-  // const { setCurrentSequenceNumber, addOrUpdateSequence } = useVolcaStore(
-  //   (state) => ({
-  //     setCurrentSequenceNumber: state.setCurrentSequenceNumber,
-  //     addOrUpdateSequence: state.addOrUpdateSequence,
-  //   }),
-  //   shallow
-  // )
   const setCurrentSequenceNumber = useVolcaStore((state) => state.setCurrentSequenceNumber);
   const addOrUpdateSequence = useVolcaStore((state) => state.addOrUpdateSequence);
   const getSequence = useVolcaStore(state => state.getSequence)
 
-  const [currentChannel, _setCurrentChannel] = useState(channel - 1)
+  const [currentChannel, _setCurrentChannel] = useState<number>(channel - 1)
 
   const deviceInquiry = () => {
     console.log('VolcaFMContextProvider deviceInquiry - sending deviceInquiryRequest')
-    const request = hexToBytes(deviceInquiryRequest.replace('c', currentChannel))
+    const request = hexToBytes(deviceInquiryRequest.replace('c', currentChannel.toString()))
     sendUniversalMessage(0x7e, request)
   }
 
-  const setCurrentChannel = (channel) => {
+  const setCurrentChannel = (channel: number) => {
     if (channel >= 0 && channel < 16) {
       _setCurrentChannel(channel)
     }
   }
 
   useEffect(() => {
-    if (lastRxSysexMessage && lastRxSysexMessage.length) {
-      const [firstByte, ...sysexMessage] = lastRxSysexMessage
+    if (lastRxSysexMessage && lastRxSysexMessage.length > 1) {
+      const [firstByte, ...sysexMessage]: Array<number> = Array.from(lastRxSysexMessage)
       if (firstByte == 0x42) {
         console.log('Korg message for us ', sysexMessage)
         parseKorgMessage(sysexMessage)
@@ -84,7 +84,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     return 0x30 | currentChannel
   }
 
-  const loadSequenceNumber = (number) => {
+  const loadSequenceNumber = (number: number) => {
     setCurrentSequenceNumber(-1)
     const seqNumber = Number(number - 1).toString(16)
     const request = hexToBytes(seqDumpRequest.replace('s', seqNumber))
@@ -110,7 +110,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
   //   sendSysexMessage(message)
   // }
 
-  const saveSequenceNumber = (number) => {
+  const saveSequenceNumber = (number: number) => {
     //Get it from the store!!!
     const sequence = getSequence(number)
     if (!sequence) {
@@ -126,10 +126,10 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     sendSysexMessage(message)
   }
 
-  const parseUniversalMessage = (sysexMessage) => {
-    const message = [...sysexMessage]
-    const channel = message.shift() & 0x0f
-    if (channel != currentChannel) {
+  const parseUniversalMessage = (sysexMessage: number[]) => {
+    const [channelByte, ...message]: Array<number> = sysexMessage
+    const channel = channelByte & 0x0f
+    if (channelByte == undefined || channel != currentChannel) {
       console.log(`parseUniversalMessage Error Channel ${channel} is not for us ${currentChannel}`)
       return
     }
@@ -144,10 +144,10 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     }
   }
 
-  const parseKorgMessage = (sysexMessage) => {
-    const message = [...sysexMessage]
-    const channel = message.shift() & 0x0f
-    if (channel != currentChannel) {
+  const parseKorgMessage = (sysexMessage: number[]) => {
+    const [channelByte, ...message]: Array<number> = sysexMessage
+    const channel = channelByte & 0x0f
+    if (channelByte == undefined || channel != currentChannel) {
       console.log(`Parse Error Channel ${channel} is not for us ${currentChannel}`)
       return
     }
@@ -177,7 +177,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     }
   }
 
-  const parseNumberedSequence = (sequenceBytes) => {
+  const parseNumberedSequence = (sequenceBytes: number[]) => {
     const sequenceNumber = sequenceBytes.shift()
     console.log('parseNumberedSequence ', sequenceNumber)
     const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
@@ -186,7 +186,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }) => {
     setCurrentSequenceNumber(sequence.programNumber)
   }
 
-  const parseCurrentSequence = (sequenceBytes) => {
+  const parseCurrentSequence = (sequenceBytes: number[]) => {
     const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
     addOrUpdateSequence(sequence)
     setCurrentSequenceNumber(sequence.programNumber)

@@ -1,23 +1,23 @@
 import React, { useContext, useState } from 'react'
-import VolcaFMContext from '../../contexts/VolcaFMContext.js'
-import { useVolcaStore } from '../../stores/useVolcaStore.js'
+import VolcaFMContext from '../../contexts/VolcaFMContext'
+import { useVolcaStore } from '../../stores/useVolcaStore'
 
 const GetSequence = () => {
-	const {
+  const {
     deviceInquiry,
     saveSequenceNumber,
     loadCurrentSequence,
-		loadSequenceNumber,
+    loadSequenceNumber,
     webMidiContext,
-	} = useContext(VolcaFMContext)
+  } = useContext(VolcaFMContext)
 
   const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
-    
+
 
   const {
     midiInitialised,
-	} = webMidiContext
-  
+  } = webMidiContext
+
   //Seems yucky - can we do 'uncontrolled'? 
   const [_sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber)
 
@@ -33,23 +33,23 @@ const GetSequence = () => {
     saveSequenceNumber(_sequenceNumber)
   }
 
-  if(!midiInitialised) {
+  if (!midiInitialised) {
     return null
   }
 
   return (
-		<fieldset className="group-control">
-			<legend>Get Sequence</legend>
-			<div className="get-sequence">
-				<div className="sequence-select">
-					<label htmlFor="sequence-select">Sequence Number</label>{' '}
-					<input type="number" id="sequence-select" min="1" max="16" value={_sequenceNumber} onChange={handleSequenceNumberChange}/>
+    <fieldset className="group-control">
+      <legend>Get Sequence</legend>
+      <div className="get-sequence">
+        <div className="sequence-select">
+          <label htmlFor="sequence-select">Sequence Number</label>{' '}
+          <input type="number" id="sequence-select" min="1" max="16" value={_sequenceNumber} onChange={handleSequenceNumberChange} />
           <button onClick={handleGetSequenceNumber}>Load</button>
           <button onClick={handleSaveSequenceNumber}>Save</button>
         </div>
         <button onClick={loadCurrentSequence}>Load Current</button>
         <button onClick={deviceInquiry}>Check Device</button>
-			</div>
+      </div>
     </fieldset>
   )
 }
