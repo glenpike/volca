@@ -1,11 +1,16 @@
+export type SentSysexMessage = {
+  manufacturer: number;
+  data: Uint8Array;
+}
+
 export interface WebMidiContextType {
   midiInitialised: boolean;
   currentOutput: any | null; // or more specific MIDI output type
   currentInput: any | null;  // or more specific MIDI input type
   midiOutputs: any[] | null; // or more specific array type
   midiInputs: any[] | null;
-  lastTxSysexMessage: string | null;
-  lastRxSysexMessage: string | null;
+  lastTxSysexMessage: SentSysexMessage | null;
+  lastRxSysexMessage: Uint8Array | null;
   initialise: () => void;
   setManufacturer: (manufacturer: number) => void;
   setCurrentOutput: (output: any) => void; // or specific type
@@ -13,5 +18,5 @@ export interface WebMidiContextType {
   getCurrentOutput: () => any | null;
   getCurrentInput: () => any | null;
   sendSysexMessage: (message: any) => void; // or specific message type
-  sendUniversalMessage: (identification: number, data: Uint8Array) => void;
+  sendUniversalMessage: (manufacturer: number, data: Uint8Array) => void;
 }
