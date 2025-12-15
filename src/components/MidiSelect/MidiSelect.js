@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import './MidiSelect.css'
-import VolcaFMContext from '../../contexts/VolcaFMContext.js'
+import VolcaFMContext from '../../contexts/VolcaFMContext'
 
 const MidiSelect = () => {
   const {
@@ -10,40 +10,40 @@ const MidiSelect = () => {
   } = useContext(VolcaFMContext)
 
   const {
-		currentOutput,
+    currentOutput,
     currentInput,
-		midiOutputs,
+    midiOutputs,
     midiInputs,
-		setCurrentOutput,
+    setCurrentOutput,
     setCurrentInput,
-		initialise,
+    initialise,
     midiInitialised,
-	} = webMidiContext
-  
-	const selectedOutput = midiOutputs && midiOutputs.indexOf(currentOutput)
+  } = webMidiContext
+
+  const selectedOutput = midiOutputs && midiOutputs.indexOf(currentOutput)
   const selectedInput = midiInputs && midiInputs.indexOf(currentInput)
 
-	useEffect(() => {
-    if(!midiInitialised) {
-		  initialise()
+  useEffect(() => {
+    if (!midiInitialised) {
+      initialise()
     }
-	}, [midiInitialised])
+  }, [midiInitialised])
 
-	const handleOutputChange = (event) => {
-		const index = +event.target.value
-		setCurrentOutput(index)
-	}
+  const handleOutputChange = (event) => {
+    const index = +event.target.value
+    setCurrentOutput(index)
+  }
 
   const handleInputChange = (event) => {
-		const index = +event.target.value
-		setCurrentInput(index)
-	}
+    const index = +event.target.value
+    setCurrentInput(index)
+  }
 
   const handleChannelChange = (event) => {
     setCurrentChannel(event.target.value - 1)
   }
 
-  const channel = currentChannel !== null ? currentChannel+1 : '';
+  const channel = currentChannel !== null ? currentChannel + 1 : '';
 
   return (
     <div className='midi-selects'>
@@ -85,10 +85,10 @@ const MidiSelect = () => {
       </div>
       <div className="midi-select">
         <label htmlFor="midi-channel-select">Channel</label>{' '}
-        <input type="number" id="midi-channel-select" name="midi-channel-select" min="1" max="16" value={channel} onChange={handleChannelChange}/>
+        <input type="number" id="midi-channel-select" name="midi-channel-select" min="1" max="16" value={channel} onChange={handleChannelChange} />
       </div>
     </div>
-	)
+  )
 }
 
 export default MidiSelect

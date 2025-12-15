@@ -1,11 +1,11 @@
 import React, { useState, createContext } from 'react'
 import { bytesToHex } from '../utils/utils.js'
-import { WebMidiContextType, SentSysexMessage } from '../types'
+import { MidiContextType, SentSysexMessage } from '../types'
 import { Input, Output } from 'webmidi'
 
 const sysexEnabled = true
 
-const WebMidiContext = createContext<WebMidiContextType>({
+const WebMidiContext = createContext<MidiContextType>({
 	midiInitialised: false,
 	currentOutput: null,
 	currentInput: null,

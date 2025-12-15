@@ -4,4 +4,5 @@
  */
 
 export * from './volca';
-export * from './webmidi';
+export * from './midi_context';
+export * from './volca_fm_context';

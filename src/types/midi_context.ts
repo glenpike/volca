@@ -3,7 +3,7 @@ export type SentSysexMessage = {
   data: Uint8Array;
 }
 
-export interface WebMidiContextType {
+export interface MidiContextType {
   midiInitialised: boolean;
   currentOutput: any | null; // or more specific MIDI output type
   currentInput: any | null;  // or more specific MIDI input type
