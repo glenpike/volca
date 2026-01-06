@@ -3,6 +3,7 @@ import './MidiSelect.css'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
 
 const MidiSelect = () => {
+
   const {
     currentChannel,
     setCurrentChannel,
