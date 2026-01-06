@@ -1,0 +1,25 @@
+.mode-select-label {
+  font-size: 1.4rem;
+  padding: 0.1rem 1rem 0.1rem;
+}
+
+.mode-select-button {
+  border-radius: 0.2rem;
+  background-color: var(--gold);
+  padding: 0.1rem;
+  display: inline-flex;
+}
+
+.mode-select-button span {
+  padding: 0.2rem;
+  margin: 0.2rem;
+  border-radius: 0.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.mode-select-button[aria-checked="true"] span:first-child,
+.mode-select-button[aria-checked="false"] span:last-child {
+  background: #000;
+  color: var(--gold);
+}

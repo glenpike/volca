@@ -14,10 +14,10 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: var(--black);
   font-size: calc(10px + 2vmin);
   padding: 1rem;
-  color: white;
+  color: var(--gold);
 }
 
 .control__bar {
@@ -26,11 +26,13 @@
   justify-content: space-between;
   width: 100%;
 }
+
 .control__heading {
   font-size: 1.4rem;
   margin: 0;
   padding: 0.1rem 1rem;
 }
+
 .App-link {
   color: #61dafb;
 }
@@ -39,6 +41,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

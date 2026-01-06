@@ -1,7 +1,6 @@
 .midi-selects {
 	display: flex;
 	flex-direction: row;
-	/* padding-top: 0.2rem; */
 }
 
 .midi-select {
@@ -12,9 +11,14 @@
 .midi-select select,
 .midi-select input {
 	font-size: 1.4rem;
-	padding: 0.1rem;
+	padding: 0.2rem;
 }
 
 .midi-select label {
 	padding-right: 0.5rem;
+}
+
+.midi-select select,
+.midi-select input {
+	background-color: var(--turquoise);
 }

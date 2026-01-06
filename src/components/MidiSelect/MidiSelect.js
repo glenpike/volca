@@ -1,6 +1,8 @@
 import React, { useContext, useEffect } from 'react'
 import './MidiSelect.css'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
+import ModeSelect from '../ModeSelect/ModeSelect'
+import { useMidiMode } from '../../contexts/MidiModeContext'
 
 const MidiSelect = () => {
 
@@ -23,6 +25,7 @@ const MidiSelect = () => {
 
   const selectedOutput = midiOutputs && midiOutputs.indexOf(currentOutput)
   const selectedInput = midiInputs && midiInputs.indexOf(currentInput)
+  const { mode } = useMidiMode();
 
   useEffect(() => {
     if (!midiInitialised) {
@@ -55,6 +58,7 @@ const MidiSelect = () => {
           name="midi-input-select"
           value={selectedInput}
           onChange={handleInputChange}
+          disabled={mode === 'test'}
         >
           <option value="-1"> Please select </option>{' '}
           {midiInputs.map((midiInput, index) => {
@@ -73,6 +77,7 @@ const MidiSelect = () => {
           name="midi-output-select"
           value={selectedOutput}
           onChange={handleOutputChange}
+          disabled={mode === 'test'}
         >
           <option value="-1"> Please select </option>{' '}
           {midiOutputs.map((midiOutput, index) => {
@@ -86,8 +91,9 @@ const MidiSelect = () => {
       </div>
       <div className="midi-select">
         <label htmlFor="midi-channel-select">Channel</label>{' '}
-        <input type="number" id="midi-channel-select" name="midi-channel-select" min="1" max="16" value={channel} onChange={handleChannelChange} />
+        <input type="number" id="midi-channel-select" name="midi-channel-select" min="1" max="16" value={channel} onChange={handleChannelChange} disabled={mode === 'test'} />
       </div>
+      <ModeSelect />
     </div>
   )
 }
