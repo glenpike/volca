@@ -4,13 +4,13 @@ import WebMidiContext, { WebMidiContextProvider } from '../../contexts/WebMidiCo
 import { WebMidi } from 'webmidi'
 import TestMidiContext, { TestMidiContextProvider } from '../../contexts/TestMidiContext';
 import { VolcaFMContextProvider } from '../../contexts/VolcaFMContext'
-import MidiModeContext from '../../contexts/MidiModeContext'
+import MidiModeContext, { MidiMode } from '../../contexts/MidiModeContext'
 
 const KORG_MANUFACTURER_ID = 0x42
 const MIDI_CHANNEL = 1
 
 const MidiProvider = ({ children }: { children: React.ReactNode }) => {
-  const [mode, setMode] = useState(() => {
+  const [mode, setMode] = useState<MidiMode>(() => {
     const urlMode = new URLSearchParams(window.location.search).get('midiMode');
     if (urlMode === 'real' || urlMode === 'test') return urlMode;
     const stored = window.localStorage.getItem('midiMode');
@@ -21,7 +21,7 @@ const MidiProvider = ({ children }: { children: React.ReactNode }) => {
   const value = useMemo(
     () => ({
       mode,
-      setMode: (next: string) => { //FIXME - enum for type
+      setMode: (next: MidiMode) => {
         window.localStorage.setItem('midiMode', next);
         setMode(next);
       },

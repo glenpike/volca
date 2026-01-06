@@ -1,3 +1,4 @@
+import './ModeSelect.css'
 import { useMidiMode } from "../../contexts/MidiModeContext";
 
 const ModeSelect = () => {
@@ -7,9 +8,13 @@ const ModeSelect = () => {
     setMode(mode === 'real' ? 'test' : 'real');
   }
   return (
-    <label>
-      Test Mode? <input type="checkbox" name="testMode" checked={mode === 'test'} onChange={handleModeChange} />
-    </label>
+    <>
+      <span className="mode-select-label" id="mode-select">"Test Midi" Mode</span>
+      <button className="mode-select-button" role="switch" aria-checked={mode === 'test'} aria-labelledby="mode-select" onClick={handleModeChange}>
+        <span>on</span>
+        <span>off</span>
+      </button>
+    </>
   )
 }
 

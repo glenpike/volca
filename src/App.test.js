@@ -3,55 +3,47 @@ import { mockUseVolcaStore } from '../test/mockUseVolcaStore'
 
 import App from './App';
 
-const storeState = { 
+const storeState = {
   currentSequenceNumber: 10,
 }
 
-jest.mock('webmidi', () => {
-  const input = {
-    id: '1',
-    manufacturer: 'Ben',
-    name: 'Widi Input 1'
-  }
-
-  const output = {
-    id: '1',
-    manufacturer: 'Ben',
-    name: 'Widi Output 1'
-  }
-
-  const inputs = [input]
-  const outputs = [output]
-
-  const enable = (options) => {
-    console.log('fakenable')
-    return Promise.resolve(options)
-  }
-
-  const actual = jest.requireActual('webmidi')
-  const { WebMidi: wm } = actual
-
-  return {
-    ...actual,
-    WebMidi: {
-      ...wm,
-      enable,
-      inputs,
-      outputs,
-    },
-  }
-})
-
 describe('App', () => {
-  test('renders ok', async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
     mockUseVolcaStore(storeState);
-
+  })
+  test('renders ok', async () => {
     await act(async () => {
       render(<App />)
     })
 
-    const title = screen.getByText(/Korg Volca FM2 Sequences/i)
+    const title = screen.getByText(/KORG volca fm Sequences/i)
     expect(title).toBeInTheDocument()
   })
+
+  test('shows MIDI input/output selects and channel input', async () => {
+    await act(async () => {
+      render(<App />);
+    });
+    expect(screen.getByLabelText(/Input Device/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Output Device/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Channel/i)).toBeInTheDocument();
+  });
+
+  test('shows Test MIDI mode toggle and defaults to test mode', async () => {
+    await act(async () => {
+      render(<App />);
+    });
+    const toggle = screen.getByRole('switch', { name: /"Test Midi" Mode/i });
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('renders main sequence components', async () => {
+    await act(async () => {
+      render(<App />);
+    });
+    expect(screen.getByText(/Get Sequence/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Sequence Number/i)).toBeInTheDocument();
+  });
 })
