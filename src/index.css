@@ -41,6 +41,10 @@ code {
   align-items: flex-start;
 }
 
+.force-wrap {
+  word-break: break-all;
+}
+
 /* Buttons and inputs */
 .button {
   padding: 0.5rem 1rem;

@@ -1,20 +1,23 @@
 import React, { useContext, useState } from 'react'
-import VolcaFMContext from '../../contexts/VolcaFMContext'
 import { bytesToHex } from '../../utils/utils'
-import WebMidiContext from '../../contexts/WebMidiContext'
+import { useVolcaStore } from '../../stores/useVolcaStore'
+import { MidiContextType, SequenceInfo } from '../../types'
+import VolcaFMContext from '../../contexts/VolcaFMContext'
 
 const SequenceDebug = () => {
+	const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
+	const currentSequence = useVolcaStore(state => state.sequences.find((seq: SequenceInfo) => seq.programNumber === currentSequenceNumber))
+
 	const {
-		currentSequence,
+		webMidiContext,
 	} = useContext(VolcaFMContext)
 
 	const {
 		lastRxSysexMessage
-	} = useContext(WebMidiContext)
+	} = webMidiContext as MidiContextType
 
 	const [currentDump, setCurrentDump] = useState('')
 	const handleDumpSysex = () => {
-
 		setCurrentDump(bytesToHex(lastRxSysexMessage))
 	}
 
@@ -41,7 +44,7 @@ const SequenceDebug = () => {
 					rows="10"
 					value={JSON.stringify(currentDump)}
 				/> */}
-				<p>{JSON.stringify(currentDump)}</p>
+				<p className="force-wrap">{JSON.stringify(currentDump)}</p>
 			</div>
 			<button onClick={handleDumpSysex}>Dump Sysex</button>
 			<button onClick={handleDumpJSON}>Dump JSON</button>

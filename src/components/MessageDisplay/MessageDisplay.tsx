@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import WebMidiContext from '../../contexts/WebMidiContext'
 import './MessageDisplay.css'
 import { bytesToHex } from '../../utils/utils.js'
-import { MidiContextType } from '../../types'
 
 const MessageDisplay: React.FC = () => {
 	const {

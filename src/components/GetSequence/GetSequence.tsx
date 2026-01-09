@@ -10,7 +10,7 @@ const GetSequence = () => {
     loadCurrentSequence,
     loadSequenceNumber,
     webMidiContext,
-  } = useContext(VolcaFMContext) as VolcaFMContextType
+  } = useContext(VolcaFMContext)
 
   const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
 
