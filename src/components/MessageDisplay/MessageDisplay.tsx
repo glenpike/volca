@@ -1,34 +1,31 @@
 import React, { useContext } from 'react'
 import WebMidiContext from '../../contexts/WebMidiContext'
-
-
 import './MessageDisplay.css'
 import { bytesToHex } from '../../utils/utils.js'
+import { MidiContextType } from '../../types'
 
-const MessageDisplay = () => {
+const MessageDisplay: React.FC = () => {
 	const {
 		lastTxSysexMessage,
 		lastRxSysexMessage,
 	} = useContext(WebMidiContext)
 
-	const { manufacturer = '', txData = [] } = lastTxSysexMessage || {}
+	const { manufacturer = '', data: txData = [] } = lastTxSysexMessage || {}
 
 	const txMessageStr = () => {
-		if (0 == txData.length) {
+		if (txData.length === 0) {
 			return ''
 		}
 
 		return `f0,${bytesToHex([manufacturer])},${bytesToHex(txData)},f7`
 	}
 
-	const { rxData = [] } = lastRxSysexMessage || {}
-
 	const rxMessageStr = () => {
-		if (0 == rxData.length) {
+		if (!lastRxSysexMessage || lastRxSysexMessage.length === 0) {
 			return ''
 		}
 
-		return `${bytesToHex(rxData)}`
+		return `${bytesToHex(lastRxSysexMessage)}`
 	}
 
 	return (
@@ -38,7 +35,7 @@ const MessageDisplay = () => {
 				<textarea
 					className="message-display__textarea"
 					id="message-display-output"
-					rows="4"
+					rows={4}
 					defaultValue={txMessageStr()}
 				/>
 				<label className="message-display__label" htmlFor="message-display-output">
@@ -48,11 +45,11 @@ const MessageDisplay = () => {
 			<div className="message-display">
 				<textarea
 					className="message-display__textarea"
-					id="message-display-output"
-					rows="4"
+					id="message-display-input"
+					rows={4}
 					defaultValue={rxMessageStr()}
 				/>
-				<label className="message-display__label" htmlFor="message-display-output">
+				<label className="message-display__label" htmlFor="message-display-input">
 					<strong>Last Rx Sysex Message</strong>
 				</label>
 			</div>
