@@ -6,3 +6,4 @@
 export * from './volca';
 export * from './midi_context';
 export * from './volca_fm_context';
+export * from './volca_state';

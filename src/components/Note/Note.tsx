@@ -13,7 +13,7 @@ interface NoteProps {
 }
 
 const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
-  const note: NoteInfo = useVolcaStore((state) =>
+  const note: NoteInfo | undefined = useVolcaStore((state) =>
     state.sequences
       .find((seq: SequenceInfo) => seq.programNumber === sequenceId)
       ?.steps.find((step: StepInfo) => step.id === stepId)
@@ -26,10 +26,10 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
     return null
   }
 
-  const { trigger, note: [noteNumber, otherNoteValue], velocity, gateTime } = note
+  const { trigger, note: [noteNumber, otherNoteValue], velocity, gateTimeInt } = note
   const disabled = !(on && trigger)
   const noteOptions = [...musicalNotes]
-  const tiedNote = gateTime == 127
+  const tiedNote = gateTimeInt == 127
 
   const handleTriggerChange = (event: any) => {
     const trigger = !!event.target.checked
@@ -53,12 +53,12 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
   const handleTiedNoteChange = (event: any) => {
     const tiedNote = !!event.target.checked
     const newGateTime = tiedNote ? 127 : 100
-    updateNote(sequenceId, stepId, noteId, { gateTime: newGateTime })
+    updateNote(sequenceId, stepId, noteId, { gateTimeInt: newGateTime })
   }
 
   const handleGateTimeChange = (event: any) => {
     let newGateTime = parseInt(event.target.value, 10)
-    updateNote(sequenceId, stepId, noteId, { gateTime: newGateTime })
+    updateNote(sequenceId, stepId, noteId, { gateTimeInt: newGateTime })
   }
 
   return (
@@ -104,7 +104,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
         type="number"
         min="0"
         max="127"
-        value={gateTime}
+        value={gateTimeInt}
         onChange={handleGateTimeChange}
         disabled={disabled || tiedNote}
       />

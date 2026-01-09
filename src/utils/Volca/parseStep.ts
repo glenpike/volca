@@ -1,4 +1,4 @@
-import { MOTION_PARAM_NAMES } from '../../types';
+import { MOTION_PARAM_NAMES, NoteInfo, ByteArray, StepInfo, ParsedStepInfo, MotionData } from '../../types';
 
 export const GATE_TIME_LOOKUP = [
   "0", "1", "3", "4", "6", "7", "8", "10",
@@ -19,39 +19,38 @@ export const GATE_TIME_LOOKUP = [
   "100", "100", "100", "100", "100", "100", "100", "127"
 ]
 
-export const adjustNoteData = (data) => {
-  let { gateTime } = data
-  console.log('adjustNoteData', gateTime)
-  if (gateTime && gateTime > 100 && gateTime < 127) {
-    gateTime = 127
+export const adjustNoteData = (data: Partial<NoteInfo>): Partial<NoteInfo> => {
+  let { gateTimeInt = 0 } = data
+  console.log('adjustNoteData', gateTimeInt)
+  if (gateTimeInt && gateTimeInt > 100 && gateTimeInt < 127) {
+    gateTimeInt = 127
   }
-  return { ...data, gateTime }
+  return { ...data, gateTime: GATE_TIME_LOOKUP[gateTimeInt], gateTimeInt }
 }
 
-export const parseStepBytes = (bytes) => {
+export const parseStepBytes = (bytes: ByteArray): ParsedStepInfo => {
   if (bytes.length < 112) {
     throw new Error('Invalid MIDI step data length. Expected 112 bytes, received ' + bytes.length);
   }
 
-  const data = {
-    notes: [],
-    motionData: {},
-    reserved30: [],
-    reserved108: [],
-  }
+  const notes: Array<NoteInfo> = []
+  const reserved30: number[] = []
+  const reserved108: number[] = []
+  const motionData: MotionData = {}
 
   for (let i = 0; i < 6; i++) {
-    data.notes.push({
+    notes.push({
       id: i,
       note: [bytes[i * 2], bytes[(i * 2) + 1]],
       velocity: bytes[i + 18],
       gateTime: GATE_TIME_LOOKUP[bytes[24 + i] & 0x7F],
+      gateTimeInt: bytes[24 + i] & 0x7F,
       trigger: (bytes[24 + i] & 0x80) !== 0,
     })
   }
 
   for (let i = 0; i < 12; i++) {
-    data.reserved30[i] = bytes[i + 30]
+    reserved30[i] = bytes[i + 30]
   }
 
   for (let i = 0; i < MOTION_PARAM_NAMES.length; i++) {
@@ -60,24 +59,31 @@ export const parseStepBytes = (bytes) => {
     for (let j = 0; j < 5; j++) {
       paramValues.push(bytes[43 + (i * 5) + j])
     }
-    data.motionData[paramName] = paramValues
+    motionData[paramName] = paramValues
   }
 
   for (let i = 0; i < 4; i++) {
-    data.reserved108[i] = bytes[i + 108]
+    reserved108[i] = bytes[i + 108]
   }
 
-  return data
+  return {
+    notes,
+    motionData,
+    reserved30: new Uint8Array(reserved30),
+    reserved108: new Uint8Array(reserved108),
+  }
 }
 
-export const packStepData = (data) => {
+export const packStepData = (data: ParsedStepInfo) => {
   const bytes = new Array(112).fill(0)
 
+  const notes: Array<NoteInfo> = data.notes
+
   for (let i = 0; i < 6; i++) {
-    bytes[i * 2] = data.notes[i].note[0] & 0xFF
-    bytes[(i * 2) + 1] = data.notes[i].note[1] & 0xFF
-    bytes[i + 18] = data.notes[i].velocity
-    bytes[24 + i] = ((data.notes[i].trigger & 1) << 7) | (GATE_TIME_LOOKUP.indexOf(data.notes[i].gateTime) & 0x7F)
+    bytes[i * 2] = notes[i].note[0] & 0xFF
+    bytes[(i * 2) + 1] = notes[i].note[1] & 0xFF
+    bytes[i + 18] = notes[i].velocity
+    bytes[24 + i] = ((notes[i].trigger ? 1 : 0) << 7) | (GATE_TIME_LOOKUP.indexOf(notes[i].gateTime) & 0x7F)
   }
   // Reserved (Bytes 30-31): Typically not used
   for (let i = 0; i < 12; i++) {

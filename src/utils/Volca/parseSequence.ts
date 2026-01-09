@@ -1,28 +1,29 @@
 import { packMotionData, parseMotionBytes } from "./parseMotion";
 import { packSettingsData, parseSettingsBytes } from "./parseSettings";
 import { parseStepBytes, packStepData } from "./parseStep";
+import { ByteArray, SequenceInfo, StepInfo } from "../../types";
 
-export const parseSequenceBytes = (bytes) => {
+export const parseSequenceBytes = (bytes: ByteArray): SequenceInfo => {
   const header = String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]);
   if (header !== 'PTST') {
-      throw new Error('Invalid header');
+    throw new Error('Invalid header');
   }
 
-  const reserved4_5 = [bytes[4], bytes[5]]
+  const reserved4_5: [number, number] = [bytes[4], bytes[5]]
 
   // Parse the number of steps
   const numberOfSteps = bytes[15];
   // Initialize an array to hold the step objects
-  const steps = Array.from({ length: numberOfSteps }, () => ({}));
+  const steps: Array<StepInfo> = new Array(numberOfSteps);
   // console.log('Number of steps: ', numberOfSteps)
-  
+
   // Parse the step On/Off status
-  
+
   const reserved8 = bytes[8]
 
   const programNumber = bytes[9]
 
-  const reserved10_11 = [bytes[10], bytes[11]]
+  const reserved10_11: [number, number] = [bytes[10], bytes[11]]
 
   const reserved14 = bytes[14]
 
@@ -33,7 +34,7 @@ export const parseSequenceBytes = (bytes) => {
 
   // Reserved (Bytes 74-79): Typically not used
   const reserved74_79 = []
-  for (let i = 0;i < 6;i++) {
+  for (let i = 0; i < 6; i++) {
     reserved74_79[i] = bytes[i + 74]
   }
 
@@ -52,27 +53,27 @@ export const parseSequenceBytes = (bytes) => {
     const stepMotionFuncTranspose = !!(bytes[1872 + i] & 1);
     const { motionData, notes, reserved30, reserved108 } = parseStepBytes(stepData)
     steps[i] = {
-      id: i, 
+      id: i,
       on: stepOnOff,
       active: stepActive,
       motionFuncTranspose: stepMotionFuncTranspose,
       motionData,
       notes,
       reserved30,
-      reserved108, 
+      reserved108,
     }
   }
 
   // Reserved (Bytes 1888-1915): Typically not used
   const reserved1888_1915 = []
-  for (let i = 0;i < 27;i++) {
+  for (let i = 0; i < 27; i++) {
     reserved1888_1915[i] = bytes[i + 1888]
   }
 
   // Check the footer
   const footer = String.fromCharCode(bytes[1916], bytes[1917], bytes[1918], bytes[1919]);
   if (footer !== 'PTED') {
-      throw new Error('Invalid footer');
+    throw new Error('Invalid footer');
   }
 
   return {
@@ -86,8 +87,8 @@ export const parseSequenceBytes = (bytes) => {
       reserved8,
       reserved10_11,
       reserved14,
-      reserved74_79,
-      reserved1888_1915
+      reserved74_79: Uint8Array.from(reserved74_79),
+      reserved1888_1915: Uint8Array.from(reserved1888_1915)
     }
   }
 }
@@ -106,7 +107,7 @@ export const packSequenceData = ({
     reserved74_79,
     reserved1888_1915
   }
-}) => {
+}: SequenceInfo) => {
   // const numberOfSteps = steps.length
   const bytes = new Array(1919).fill(0)
 
@@ -116,12 +117,12 @@ export const packSequenceData = ({
   bytes[3] = 'T'.charCodeAt(0)
   bytes[4] = reserved4_5[0]
   bytes[5] = reserved4_5[1]
-  
+
   // Pack the step On/Off status
   for (let i = 0; i < numberOfSteps; i++) {
     const byteIndex = i < 8 ? 6 : 7
     const bitIndex = i % 8
-    bytes[byteIndex] |= (steps[i].on & 1) << bitIndex
+    bytes[byteIndex] |= (steps[i].on ? 1 : 0) << bitIndex
   }
 
   bytes[8] = reserved8
@@ -147,7 +148,7 @@ export const packSequenceData = ({
     bytes[68 + i] = value
   })
 
-  for (let i = 0;i < 6;i++) {
+  for (let i = 0; i < 6; i++) {
     bytes[i + 74] = reserved74_79[i]
   }
 
@@ -157,17 +158,18 @@ export const packSequenceData = ({
     const byteIndex = i < 8 ? 12 : 13;
     const bitIndex = i % 8;
     const onOffByteIndex = i < 8 ? 6 : 7;
-    bytes[byteIndex] |= (step.active & 1) << bitIndex
-    bytes[onOffByteIndex] |= (step.on & 1) << bitIndex
+    bytes[byteIndex] |= (step.active ? 1 : 0) << bitIndex
+    bytes[onOffByteIndex] |= (step.on ? 1 : 0) << bitIndex
     const stepDataOffset = 80 + i * 112;
     const { motionData, notes, reserved30, reserved108 } = step
     Array.from(packStepData({ motionData, notes, reserved30, reserved108 })).forEach((value, j) => {
       bytes[stepDataOffset + j] = value
     })
-    bytes[1872 + i] = step.motionFuncTranspose & 1
+    bytes[1872 + i] = step.motionFuncTranspose ? 1 : 0
   }
 
-  for (let i = 0;i < 27;i++) {
+
+  for (let i = 0; i < 27; i++) {
     bytes[i + 1888] = reserved1888_1915[i]
   }
 

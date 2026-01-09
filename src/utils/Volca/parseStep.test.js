@@ -18,9 +18,9 @@ describe('Step', () => {
         expect(step.notes[i].trigger).toBe(singleStep.notes[i].trigger)
       }
     })
-  
+
     test('parses reserved30 correctly', () => {
-      expect(step.reserved30).toEqual(singleStep.reserved30)
+      expect(step.reserved30).toEqual(Uint8Array.from(singleStep.reserved30))
     })
 
     test('parses motionData correctly', () => {
@@ -30,7 +30,7 @@ describe('Step', () => {
     })
 
     test('parses reserved108 correctly', () => {
-      expect(step.reserved108).toEqual(singleStep.reserved108)
+      expect(step.reserved108).toEqual(Uint8Array.from(singleStep.reserved108))
     })
   })
   describe('packStepData', () => {
@@ -38,7 +38,7 @@ describe('Step', () => {
     beforeEach(() => {
       bytes = packStepData(singleStep)
     })
-    
+
     test('packs notes correctly', () => {
       for (let i = 0; i < 6; i++) {
         expect(bytes[i * 2]).toBe(singleStepDataBytes[i * 2])
