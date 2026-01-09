@@ -8,8 +8,8 @@ const TestMidiContext = createContext<MidiContextType>({
   midiInitialised: false,
   currentOutput: null,
   currentInput: null,
-  midiOutputs: null,
-  midiInputs: null,
+  midiOutputs: [],
+  midiInputs: [],
   lastTxSysexMessage: null,
   lastRxSysexMessage: null,
   initialise: () => { },
@@ -39,7 +39,7 @@ const TestMidiContextProvider = ({ children, manufacturer }: TestMidiContextProv
   const [lastRxSysexMessage, setLastRxSysexMessage] = useState<Uint8Array | null>(null)
   const [midiInitialised, setMidiInitialised] = useState(false)
 
-  const setCurrentOutput = (index: number | null) => {
+  const setCurrentOutput = (_index: number | null) => {
     let output = null
     _setCurrentOutput(output)
   }
@@ -48,7 +48,7 @@ const TestMidiContextProvider = ({ children, manufacturer }: TestMidiContextProv
     return null
   }
 
-  const setCurrentInput = (index: number | null) => {
+  const setCurrentInput = (_index: number | null) => {
     let input = null
     _setCurrentInput(input)
   }

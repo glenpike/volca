@@ -1,3 +1,5 @@
+import { Input, Output } from 'webmidi'
+
 export type SentSysexMessage = {
   manufacturer: number;
   data: Uint8Array;
@@ -5,10 +7,10 @@ export type SentSysexMessage = {
 
 export interface MidiContextType {
   midiInitialised: boolean;
-  currentOutput: any | null; // or more specific MIDI output type
-  currentInput: any | null;  // or more specific MIDI input type
-  midiOutputs: any[] | null; // or more specific array type
-  midiInputs: any[] | null;
+  currentOutput: Output | null;
+  currentInput: Input | null;
+  midiOutputs: Output[];
+  midiInputs: Input[];
   lastTxSysexMessage: SentSysexMessage | null;
   lastRxSysexMessage: Uint8Array | null;
   initialise: () => void;
