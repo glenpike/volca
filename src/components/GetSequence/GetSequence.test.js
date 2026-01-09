@@ -10,7 +10,7 @@ const webMidiContext = {
   midiInitialised: false,
 }
 
-const storeState = { 
+const storeState = {
   currentSequenceNumber: 10,
 }
 
@@ -26,7 +26,7 @@ const renderWithContext = () => {
     loadSequenceNumber,
     saveSequenceNumber,
     loadCurrentSequence,
-    deviceInquiry, 
+    deviceInquiry,
     webMidiContext,
   }
 
@@ -48,15 +48,15 @@ describe('GetSequence', () => {
   describe('when midi is initialised', () => {
     test('Renders the Controls', async () => {
       webMidiContext.midiInitialised = true
-      
+
       await act(async () => {
         renderWithContext()
       })
       expect(screen.getByLabelText('Sequence Number')).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: 'Load'})).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: 'Load Current'})).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument()
-      expect(screen.getByRole('button', {name: 'Check Device'})).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Load' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Load Current' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Check Device' })).toBeInTheDocument()
     })
 
 
@@ -68,7 +68,7 @@ describe('GetSequence', () => {
       await act(async () => {
         renderWithContext()
       })
-      
+
       const number = screen.getByLabelText('Sequence Number')
       const load = screen.getByRole('button', { name: 'Load' })
       await user.clear(number)

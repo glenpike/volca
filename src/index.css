@@ -1,9 +1,12 @@
 :root {
   --gold: #CBB090;
   --turquoise: #97D5D3;
+  --dark-turquoise: #58807E;
   --black: #000;
   --red: #E8909C;
   --brown: #3E3032;
+  --golden-brown: #AA785D;
+  --white: #fff;
 }
 
 body {
