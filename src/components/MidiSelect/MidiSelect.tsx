@@ -1,8 +1,9 @@
-import React, { useContext, useEffect } from 'react'
+import React, { ChangeEvent, useContext, useEffect } from 'react'
 import './MidiSelect.css'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
 import ModeSelect from '../ModeSelect/ModeSelect'
 import { useMidiMode } from '../../contexts/MidiModeContext'
+import { MidiContextType, VolcaFMContextType } from '../../types'
 
 const MidiSelect = () => {
 
@@ -10,7 +11,7 @@ const MidiSelect = () => {
     currentChannel,
     setCurrentChannel,
     webMidiContext,
-  } = useContext(VolcaFMContext)
+  } = useContext(VolcaFMContext) as VolcaFMContextType
 
   const {
     currentOutput,
@@ -21,10 +22,10 @@ const MidiSelect = () => {
     setCurrentInput,
     initialise,
     midiInitialised,
-  } = webMidiContext
+  } = webMidiContext as MidiContextType
 
-  const selectedOutput = midiOutputs && midiOutputs.indexOf(currentOutput)
-  const selectedInput = midiInputs && midiInputs.indexOf(currentInput)
+  const selectedOutput = currentOutput ? midiOutputs.indexOf(currentOutput) : -1
+  const selectedInput = currentInput ? midiInputs.indexOf(currentInput) : -1
   const { mode } = useMidiMode();
 
   useEffect(() => {
@@ -33,18 +34,18 @@ const MidiSelect = () => {
     }
   }, [midiInitialised])
 
-  const handleOutputChange = (event) => {
-    const index = +event.target.value
+  const handleOutputChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const index = Number(event.target.value)
     setCurrentOutput(index)
   }
 
-  const handleInputChange = (event) => {
-    const index = +event.target.value
+  const handleInputChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const index = Number(event.target.value)
     setCurrentInput(index)
   }
 
-  const handleChannelChange = (event) => {
-    setCurrentChannel(event.target.value - 1)
+  const handleChannelChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCurrentChannel(Number(event.target.value) - 1)
   }
 
   const channel = currentChannel !== null ? currentChannel + 1 : '';
@@ -61,7 +62,7 @@ const MidiSelect = () => {
           disabled={mode === 'test'}
         >
           <option value="-1"> Please select </option>{' '}
-          {midiInputs.map((midiInput, index) => {
+          {midiInputs?.map((midiInput, index) => {
             return (
               <option key={index} value={index}>
                 {midiInput.name}
@@ -80,7 +81,7 @@ const MidiSelect = () => {
           disabled={mode === 'test'}
         >
           <option value="-1"> Please select </option>{' '}
-          {midiOutputs.map((midiOutput, index) => {
+          {midiOutputs?.map((midiOutput, index) => {
             return (
               <option key={index} value={index}>
                 {midiOutput.name}
