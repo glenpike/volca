@@ -1,11 +1,12 @@
 import React, { useState, useEffect, createContext } from 'react'
 import { bytesToHex, hexToBytes } from '../utils/utils'
 import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
-import { parseSequenceBytes } from '../utils/Volca/parseSequence'
+import { parseSequenceBytes, packSequenceData } from '../utils/Volca/parseSequence'
 import { useVolcaStore } from '../stores/useVolcaStore'
 
-import { VolcaFMContextType, MidiContextType } from '../types'
+import { VolcaFMContextType, MidiContextType, ByteArray } from '../types'
 import VolcaFMContextError from '../errors/VolcaFMContextError'
+import { SequenceInfo } from '../types'
 
 // const exclusiveHeaderReply = '0x00, 0x01, 0x02F' //unused
 // const searchDeviceRequest = '0x50, 0x00, 0x77'
@@ -62,7 +63,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     }
   }
 
-  const throwError = (message: string) => {
+  const throwError = (message: string): never => {
     console.log(message)
     throw new VolcaFMContextError(message)
   }
@@ -113,13 +114,14 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
 
   const saveSequenceNumber = (number: number) => {
     //Get it from the store!!!
-    const sequence = getSequence(number)
+    const sequence: SequenceInfo | null = getSequence(number)
     if (!sequence) {
       throwError(`No sequence loaded for ${number} to save`)
+      return
     }
 
     const seqNumber = Number(number - 1).toString(16)
-    const data = convert8to7bit(sequence.toBytes())
+    const data = convert8to7bit(packSequenceData(sequence))
     const request = hexToBytes(sequenceSendRequest.replace('%{sequenceNumber}', seqNumber))
     const message = [_channelHex()].concat(request, data)
     console.log('saving sequence ', bytesToHex(message))
@@ -178,14 +180,14 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
   const parseNumberedSequence = (sequenceBytes: number[]) => {
     const sequenceNumber = sequenceBytes.shift()
     console.log('parseNumberedSequence ', sequenceNumber)
-    const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
+    const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
 
     addOrUpdateSequence(sequence)
     setCurrentSequenceNumber(sequence.programNumber)
   }
 
   const parseCurrentSequence = (sequenceBytes: number[]) => {
-    const sequence = parseSequenceBytes(convert7to8bit(sequenceBytes))
+    const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
     addOrUpdateSequence(sequence)
     setCurrentSequenceNumber(sequence.programNumber)
   }

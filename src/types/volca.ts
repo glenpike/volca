@@ -61,7 +61,8 @@ export interface NoteInfo {
   id: number;
   note: [number, number]; // [noteNumber, otherNoteValue] - MIDI note data
   velocity: number; // 0-127
-  gateTime: string | number; // FIXME!! Gate time value, can be string from lookup or number
+  gateTime: string;
+  gateTimeInt?: number;
   trigger: boolean; // Whether this note is triggered
 }
 
@@ -89,6 +90,14 @@ export interface SequenceSettings {
   tempo: Tempo;
   chorusDepth: number; // 0-127
   reverbDepth: number; // 0-127
+}
+
+// Individual Step interface
+export interface ParsedStepInfo {
+  notes: NoteInfo[]; // Array of up to 6 notes per step
+  motionData: MotionData; // Motion parameter data for this step
+  reserved30: ByteArray; // Reserved bytes 30-41 (12 bytes)
+  reserved108: ByteArray; // Reserved bytes 108-111 (4 bytes)
 }
 
 // Individual Step interface

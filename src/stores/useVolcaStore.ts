@@ -1,20 +1,23 @@
 import { create } from 'zustand';
 import { adjustNoteData } from '../utils/Volca/parseStep';
+import { SequenceInfo, NoteInfo, StepInfo, VolcaState } from '../types';
 
-export const useVolcaStore = create((set) => ({
+
+export const useVolcaStore = create<VolcaState>((set, get) => ({
   currentSequenceNumber: null,
   sequences: [],
-  setCurrentSequenceNumber: (number) => set({ currentSequenceNumber: number }),
-  getSequence: (number) => set((state) => {
-    const sequence = state.sequences.find((seq) => seq.programNumber === number);
+  setCurrentSequenceNumber: (number: number) => set({ currentSequenceNumber: number }),
+  getSequence: (number: number) => {
+    const state = get()
+    const sequence = state.sequences.find((seq: SequenceInfo) => seq.programNumber === number);
     if (sequence) {
       return sequence;
     }
     return null;
-  }),
+  },
   clearSequences: () => set({ sequences: [] }),
-  addOrUpdateSequence: (sequence) => set((state) => {
-    const existingSequenceIndex = state.sequences.findIndex((seq) => seq.programNumber === sequence.programNumber);
+  addOrUpdateSequence: (sequence: SequenceInfo) => set((state: any) => {
+    const existingSequenceIndex = state.sequences.findIndex((seq: SequenceInfo) => seq.programNumber === sequence.programNumber);
     if (existingSequenceIndex !== -1) {
       // Overwrite the existing sequence
       const updatedSequences = [...state.sequences];
@@ -38,14 +41,14 @@ export const useVolcaStore = create((set) => ({
   //   }
   //   return { sequences: [...state.sequences] };
   // }),
-  updateNote: (sequenceId, stepId, noteId, updatedData) => set((state) => {
+  updateNote: (sequenceId: number, stepId: number, noteId: number, updatedData: Partial<NoteInfo>) => set((state: any) => {
     console.log('updateNote ', sequenceId)
-    const sequence = state.sequences.find((seq) => seq.programNumber === sequenceId);
+    const sequence = state.sequences.find((seq: SequenceInfo) => seq.programNumber === sequenceId);
     if (sequence) {
       console.log('updateNote sequence', stepId, noteId)
-      const step = sequence.steps.find((step) => step.id === stepId);
+      const step = sequence.steps.find((step: StepInfo) => step.id === stepId);
       if (step) {
-        const noteIndex = step.notes.findIndex((note) => note.id === noteId);
+        const noteIndex = step.notes.findIndex((note: NoteInfo) => note.id === noteId);
         console.log('updateNote step', noteId, noteIndex)
         if (noteIndex !== -1) {
           const adjustedData = adjustNoteData(updatedData)
