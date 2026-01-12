@@ -1,5 +1,5 @@
 import React, { useState, createContext } from 'react'
-import { bytesToHex } from '../utils/utils.js'
+import { bytesToHex } from '../utils/utils'
 import { MidiContextType, SentSysexMessage } from '../types'
 import { Input, Output } from 'webmidi'
 
@@ -53,12 +53,12 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 				const inputsArray: Input[] = []
 
 				WebMidi.inputs.forEach((input: Input) => {
-					console.log(input.manufacturer, input.name)
+					// console.log(input.manufacturer, input.name)
 					inputsArray.push(input)
 				})
 
 				WebMidi.outputs.forEach((output: Output) => {
-					console.log(output.manufacturer, output.name)
+					// console.log(output.manufacturer, output.name)
 					outputsArray.push(output)
 				})
 				setCurrentOutput(null)

@@ -33,8 +33,6 @@ export const parseMotionBytes = (paramBytes: ByteArray, switchBytes: ByteArray):
     switches: new Array(16).fill({}) as Array<SequenceMotionValues>
   }
   const { motion, switches } = motionSwitchData
-  console.log('motion: ', motion)
-  console.log('switches: ', switches)
   for (let i = 0; i < MOTION_PARAM_NAMES.length; i++) {
     const paramName = MOTION_PARAM_NAMES[i];
     const paramValue = (paramBytes[2 * i] << 8) | paramBytes[1 + 2 * i];

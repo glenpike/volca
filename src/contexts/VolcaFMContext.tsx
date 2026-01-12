@@ -54,7 +54,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
   const deviceInquiry = () => {
     console.log('VolcaFMContextProvider deviceInquiry - sending deviceInquiryRequest')
     const request = hexToBytes(deviceInquiryRequest.replace('%{channel}', currentChannel.toString()))
-    sendUniversalMessage(0x7e, request)
+    sendUniversalMessage(0x7e, Uint8Array.from(request))
   }
 
   const setCurrentChannel = (channel: number) => {
