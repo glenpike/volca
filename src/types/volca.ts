@@ -61,8 +61,7 @@ export interface NoteInfo {
   id: number;
   note: [number, number]; // [noteNumber, otherNoteValue] - MIDI note data
   velocity: number; // 0-127
-  gateTime: string;
-  gateTimeInt?: number;
+  gateTimeInt: number;
   trigger: boolean; // Whether this note is triggered
 }
 

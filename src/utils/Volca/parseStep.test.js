@@ -14,7 +14,7 @@ describe('Step', () => {
       for (let i = 0; i < 6; i++) {
         expect(step.notes[i].note).toEqual(singleStep.notes[i].note)
         expect(step.notes[i].velocity).toBe(singleStep.notes[i].velocity)
-        expect(step.notes[i].gateTime).toBe(singleStep.notes[i].gateTime)
+        expect(step.notes[i].gateTimeInt).toBe(singleStep.notes[i].gateTimeInt)
         expect(step.notes[i].trigger).toBe(singleStep.notes[i].trigger)
       }
     })

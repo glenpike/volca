@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { adjustNoteData } from '../utils/Volca/parseStep';
 import { SequenceInfo, NoteInfo, StepInfo, VolcaState } from '../types';
 
 
@@ -51,12 +50,10 @@ export const useVolcaStore = create<VolcaState>((set, get) => ({
         const noteIndex = step.notes.findIndex((note: NoteInfo) => note.id === noteId);
         console.log('updateNote step', noteId, noteIndex)
         if (noteIndex !== -1) {
-          const adjustedData = adjustNoteData(updatedData)
           step.notes[noteIndex] = {
             ...step.notes[noteIndex],
-            ...adjustedData,
+            ...updatedData,
           };
-          console.log('updateNote ', adjustedData)
         }
       }
     }

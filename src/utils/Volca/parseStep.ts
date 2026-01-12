@@ -19,13 +19,8 @@ export const GATE_TIME_LOOKUP = [
   "100", "100", "100", "100", "100", "100", "100", "127"
 ]
 
-export const adjustNoteData = (data: Partial<NoteInfo>): Partial<NoteInfo> => {
-  let { gateTimeInt = 0 } = data
-  console.log('adjustNoteData', gateTimeInt)
-  if (gateTimeInt && gateTimeInt > 100 && gateTimeInt < 127) {
-    gateTimeInt = 127
-  }
-  return { ...data, gateTime: GATE_TIME_LOOKUP[gateTimeInt], gateTimeInt }
+export const getGateTimeString = (gateTimeInt: number): string => {
+  return GATE_TIME_LOOKUP[gateTimeInt]
 }
 
 export const parseStepBytes = (bytes: ByteArray): ParsedStepInfo => {
@@ -43,7 +38,6 @@ export const parseStepBytes = (bytes: ByteArray): ParsedStepInfo => {
       id: i,
       note: [bytes[i * 2], bytes[(i * 2) + 1]],
       velocity: bytes[i + 18],
-      gateTime: GATE_TIME_LOOKUP[bytes[24 + i] & 0x7F],
       gateTimeInt: bytes[24 + i] & 0x7F,
       trigger: (bytes[24 + i] & 0x80) !== 0,
     })
@@ -83,7 +77,7 @@ export const packStepData = (data: ParsedStepInfo) => {
     bytes[i * 2] = notes[i].note[0] & 0xFF
     bytes[(i * 2) + 1] = notes[i].note[1] & 0xFF
     bytes[i + 18] = notes[i].velocity
-    bytes[24 + i] = ((notes[i].trigger ? 1 : 0) << 7) | (GATE_TIME_LOOKUP.indexOf(notes[i].gateTime) & 0x7F)
+    bytes[24 + i] = ((notes[i].trigger ? 1 : 0) << 7) | notes[i].gateTimeInt & 0x7F
   }
   // Reserved (Bytes 30-31): Typically not used
   for (let i = 0; i < 12; i++) {
