@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import WebMidiContext from '../../contexts/WebMidiContext'
 import './MessageDisplay.css'
-import { bytesToHex } from '../../utils/utils.js'
+import { bytesToHex } from '../../utils/utils'
 
 const MessageDisplay: React.FC = () => {
 	const {
@@ -9,14 +9,14 @@ const MessageDisplay: React.FC = () => {
 		lastRxSysexMessage,
 	} = useContext(WebMidiContext)
 
-	const { manufacturer = '', data: txData = [] } = lastTxSysexMessage || {}
+	const { manufacturer = 0, data: txData = [] } = lastTxSysexMessage || {}
 
 	const txMessageStr = () => {
 		if (txData.length === 0) {
 			return ''
 		}
 
-		return `f0,${bytesToHex([manufacturer])},${bytesToHex(txData)},f7`
+		return `f0,${bytesToHex([Number(manufacturer)])},${bytesToHex(txData)},f7`
 	}
 
 	const rxMessageStr = () => {

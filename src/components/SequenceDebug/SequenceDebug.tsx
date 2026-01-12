@@ -18,6 +18,7 @@ const SequenceDebug = () => {
 
 	const [currentDump, setCurrentDump] = useState('')
 	const handleDumpSysex = () => {
+		if (!lastRxSysexMessage) return
 		setCurrentDump(bytesToHex(lastRxSysexMessage))
 	}
 

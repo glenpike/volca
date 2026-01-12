@@ -15,8 +15,8 @@ const midiNotes = [
 export default midiNotes
 export const musicalNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
-export const noteNumberToOctave = (noteNumber) => Math.floor(noteNumber / 12) - 1
-export const noteNumberToName = (noteNumber) => musicalNotes[noteNumber % 12]
+export const noteNumberToOctave = (noteNumber: number) => Math.floor(noteNumber / 12) - 1
+export const noteNumberToName = (noteNumber: number) => musicalNotes[noteNumber % 12]
 
-export const midiToNote = (noteNumber) => midiNotes[noteNumber]
-export const noteToMidi = (note) => midiNotes.indexOf(note)
+export const midiToNote = (noteNumber: number) => midiNotes[noteNumber]
+export const noteToMidi = (note: string) => midiNotes.indexOf(note)

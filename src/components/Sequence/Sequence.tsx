@@ -11,7 +11,6 @@ const Sequence = () => {
   } = useContext(VolcaFMContext)
 
   const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
-  console.log('Sequence currentSequenceNumber', currentSequenceNumber)
   const currentSequence = useVolcaStore(state => state.sequences.find((seq: SequenceInfo) => seq.programNumber === currentSequenceNumber))
 
   const {
