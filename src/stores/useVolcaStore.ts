@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create, type ExtractState } from 'zustand';
 import { SequenceInfo, NoteInfo, StepInfo, VolcaState } from '../types';
 
 
@@ -6,6 +6,7 @@ export const useVolcaStore = create<VolcaState>((set, get) => ({
   currentSequenceNumber: null,
   sequences: [],
   setCurrentSequenceNumber: (number: number) => set({ currentSequenceNumber: number }),
+  getCurrentSequenceNumber: () => get().currentSequenceNumber,
   getSequence: (number: number) => {
     const state = get()
     const sequence = state.sequences.find((seq: SequenceInfo) => seq.programNumber === number);
@@ -60,3 +61,5 @@ export const useVolcaStore = create<VolcaState>((set, get) => ({
     return { sequences: [...state.sequences] };
   }),
 }));
+
+export type VolcaStoreState = ExtractState<typeof useVolcaStore>

@@ -22,6 +22,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
 
   const updateNote = useVolcaStore((state) => state.updateNote)
 
+  const idString = `${sequenceId}-${stepId}-${noteId}`
   if (!note) {
     return null
   }
@@ -63,12 +64,16 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
 
   return (
     <div className="note">
-      <input
-        aria-label="Trigger Note"
-        type="checkbox"
-        checked={note.trigger}
-        onChange={handleTriggerChange}
-      />
+      <label htmlFor={`trigger-${idString}`}>
+        Trigger?
+        <input
+          id={`trigger-${idString}`}
+          aria-label="Trigger Note"
+          type="checkbox"
+          checked={note.trigger}
+          onChange={handleTriggerChange}
+        />
+      </label>
       <select
         aria-label="Note"
         defaultValue={noteNumberToName(noteNumber)}
@@ -108,12 +113,17 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
         onChange={handleGateTimeChange}
         disabled={disabled || tiedNote}
       />
-      <input
-        aria-label="Tie Note"
-        type="checkbox"
-        checked={tiedNote}
-        onChange={handleTiedNoteChange}
-      />
+      <label htmlFor={`tiedNote-${idString}`}>
+        Tied Note?
+        <input
+          id={`tiedNote-${idString}`}
+          aria-label="Tied Note"
+          type="checkbox"
+          checked={tiedNote}
+          onChange={handleTiedNoteChange}
+          disabled={disabled}
+        />
+      </label>
       <p className="noteMotionData">Motion Data: {JSON.stringify(motionData)}</p>
     </div>
   )

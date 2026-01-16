@@ -1,4 +1,4 @@
-import midiNotes, { 
+import KORG_MIDI_NOTES, {
   musicalNotes,
   noteNumberToOctave,
   noteNumberToName,
@@ -7,8 +7,12 @@ import midiNotes, {
 } from './MidiNotes';
 
 describe('MidiNotes Utilities', () => {
-  test('midiNotes array should have 128 elements', () => {
-    expect(midiNotes.length).toBe(128);
+  test('KORG_MIDI_NOTES array should have 128 elements', () => {
+    expect(KORG_MIDI_NOTES.length).toBe(128);
+  });
+
+  test('First KORG MIDI NOTE should be C-1', () => {
+    expect(KORG_MIDI_NOTES[0]).toBe('C-1');
   });
 
   test('musicalNotes array should have 12 elements', () => {
@@ -30,21 +34,21 @@ describe('MidiNotes Utilities', () => {
   });
 
   test('midiToNote should return correct note', () => {
-    expect(midiToNote(0)).toBe('C-2');
-    expect(midiToNote(24)).toBe('C0');
-    expect(midiToNote(60)).toBe('C3');
-    expect(midiToNote(127)).toBe('G8');
+    expect(midiToNote(0)).toBe('C-1');
+    expect(midiToNote(24)).toBe('C1');
+    expect(midiToNote(60)).toBe('C4');
+    expect(midiToNote(127)).toBe('G9');
   });
 
   test('noteToMidi should return correct MIDI number', () => {
-    expect(noteToMidi('C-2')).toBe(0);
-    expect(noteToMidi('C0')).toBe(24);
-    expect(noteToMidi('C3')).toBe(60);
-    expect(noteToMidi('G8')).toBe(127);
+    expect(noteToMidi('C-1')).toBe(0);
+    expect(noteToMidi('C1')).toBe(24);
+    expect(noteToMidi('C4')).toBe(60);
+    expect(noteToMidi('G9')).toBe(127);
   });
 
   test('noteToMidi should return -1 for invalid note', () => {
     expect(noteToMidi('H2')).toBe(-1);
-    expect(noteToMidi('C#9')).toBe(-1);
+    expect(noteToMidi('C#10')).toBe(-1);
   });
 });

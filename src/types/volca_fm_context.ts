@@ -5,7 +5,7 @@ export interface VolcaFMContextType {
   currentChannel: number,
   setCurrentChannel: (channel: number) => void,
   loadSequenceNumber: (sequenceNumber: number) => void,
-  saveSequenceNumber: (sequenceNumber: number) => void,
+  saveToSequenceNumber: (sequenceNumber: number) => void,
   loadCurrentSequence: () => void,
   webMidiContext: MidiContextType | null,
 }
