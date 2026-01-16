@@ -61,5 +61,3 @@ export const useVolcaStore = create<VolcaState>((set, get) => ({
     return { sequences: [...state.sequences] };
   }),
 }));
-
-export type VolcaStoreState = ExtractState<typeof useVolcaStore>
