@@ -55,7 +55,7 @@ describe('GetSequence', () => {
       expect(screen.getByLabelText('Sequence Number')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Load' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Load Current' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Save current to...' })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Check Device' })).toBeInTheDocument()
     })
 

@@ -1,10 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import Note from './Note'
+import { noteNumberToOctave, noteNumberToName } from '../../utils/MidiNotes'
 import { mockUseVolcaStore } from '../../../test/mockUseVolcaStore'
 
+const updateNote = jest.fn()
+const noteNumber = 60
+const velocity = 100
+const note = { id: 0, note: [noteNumber, 0], velocity, gateTimeInt: 100, trigger: true }
 
 const renderNote = ({ on = true, trigger = true }) => {
-  const note = { id: 0, note: [60, 0], velocity: 100, gateTime: "50", trigger }
+  note.trigger = trigger
   const step = {
     id: 0,
     on,
@@ -21,6 +26,7 @@ const renderNote = ({ on = true, trigger = true }) => {
   const storeState = {
     currentSequenceNumber: 0,
     sequences: [sequence],
+    updateNote,
   }
   jest.clearAllMocks();
   mockUseVolcaStore(storeState);
@@ -138,10 +144,40 @@ describe('Note Component', () => {
     })
   })
 
-  test.skip('checkbox onChange event', () => {
+  test('trigger note change event', () => {
     renderNote(noteState)
     const checkbox = screen.getByLabelText('Trigger Note')
     fireEvent.click(checkbox)
-    expect(checkbox).not.toBeChecked()
+    expect(updateNote).toHaveBeenCalledWith(0, 0, 0, { trigger: false })
+  })
+
+  test('tied note change event', () => {
+    renderNote(noteState)
+    const checkbox = screen.getByLabelText('Tied Note')
+    fireEvent.click(checkbox)
+    expect(updateNote).toHaveBeenCalledWith(0, 0, 0, { gateTimeInt: 127 })
+  })
+
+  test('note value change event', () => {
+    renderNote(noteState)
+    const noteInput = screen.getByLabelText('Note')
+    const noteName = noteNumberToName(noteNumber + 2)
+    fireEvent.change(noteInput, { target: { value: noteName } })
+    expect(updateNote).toHaveBeenCalledWith(0, 0, 0, { note: [noteNumber + 2, 0] })
+  })
+
+  test('octave value change event', () => {
+    renderNote(noteState)
+    const octaveInput = screen.getByLabelText('Octave')
+    const octaveValue = noteNumberToOctave(noteNumber + 24)
+    fireEvent.change(octaveInput, { target: { value: `${octaveValue}` } })
+    expect(updateNote).toHaveBeenCalledWith(0, 0, 0, { note: [noteNumber + 24, 0] })
+  })
+
+  test('velocity value change event', () => {
+    renderNote(noteState)
+    const velocityInput = screen.getByLabelText('Velocity')
+    fireEvent.change(velocityInput, { target: { value: velocity + 10 } })
+    expect(updateNote).toHaveBeenCalledWith(0, 0, 0, { velocity: velocity + 10 })
   })
 })

@@ -4,6 +4,7 @@ export interface VolcaState {
   currentSequenceNumber: number | null
   sequences: SequenceInfo[]
   setCurrentSequenceNumber: (number: number) => void
+  getCurrentSequenceNumber: () => number | null
   getSequence: (number: number) => SequenceInfo | null
   clearSequences: () => void
   addOrUpdateSequence: (sequence: SequenceInfo) => void

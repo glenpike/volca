@@ -1,12 +1,12 @@
 import React, { useContext, useState, ChangeEvent } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
 import { useVolcaStore } from '../../stores/useVolcaStore'
-import { MidiContextType, VolcaFMContextType } from '../../types'
+import { MidiContextType } from '../../types'
 
 const GetSequence = () => {
   const {
     deviceInquiry,
-    saveSequenceNumber,
+    saveToSequenceNumber,
     loadCurrentSequence,
     loadSequenceNumber,
     webMidiContext,
@@ -19,7 +19,7 @@ const GetSequence = () => {
     midiInitialised,
   } = webMidiContext as MidiContextType
 
-  const [_sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber)
+  const [_sequenceNumber] = useState(currentSequenceNumber)
 
   const [sequenceInput, setSequenceInput] = useState(
     String(currentSequenceNumber ?? 1)
@@ -39,7 +39,7 @@ const GetSequence = () => {
   }
 
   const handleSaveSequenceNumber = () => {
-    saveSequenceNumber(getClampedSequenceNumber())
+    saveToSequenceNumber(getClampedSequenceNumber())
   }
 
   if (!midiInitialised) {
@@ -54,7 +54,7 @@ const GetSequence = () => {
           <label htmlFor="sequence-select">Sequence Number</label>{' '}
           <input type="number" id="sequence-select" min="1" max="16" value={sequenceInput} onChange={handleSequenceNumberChange} />
           <button className="button button--primary" onClick={handleGetSequenceNumber}>Load</button>
-          <button className="button button--primary" onClick={handleSaveSequenceNumber}>Save</button>
+          <button className="button button--primary" onClick={handleSaveSequenceNumber}>Save current to...</button>
         </div>
         <div className="flex-row">
           <button className="button button--primary" onClick={loadCurrentSequence}>Load Current</button>

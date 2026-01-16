@@ -22,7 +22,7 @@ const VolcaFMContext = createContext<VolcaFMContextType>(
     currentChannel: 0,
     setCurrentChannel: (channel: number) => { },
     loadSequenceNumber: (sequenceNumber: number) => { },
-    saveSequenceNumber: (sequenceNumber: number) => { },
+    saveToSequenceNumber: (sequenceNumber: number) => { },
     loadCurrentSequence: () => { },
     webMidiContext: null,
   }
@@ -46,6 +46,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
   } = injectedMidiContext;
 
   const setCurrentSequenceNumber = useVolcaStore(state => state.setCurrentSequenceNumber);
+  const getCurrentSequenceNumber = useVolcaStore(state => state.getCurrentSequenceNumber)
   const addOrUpdateSequence = useVolcaStore(state => state.addOrUpdateSequence);
   const getSequence = useVolcaStore(state => state.getSequence)
 
@@ -98,23 +99,13 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     sendSysexMessage([_channelHex()].concat(hexToBytes(currentSeqDumpRequest)))
   }
 
-  // Do we want to do this?
-  // The current sequence on Volca is not the same as the current sequence in the store
-  // const saveCurrentSequence = () => {
-  //   const currentSequence = useVolcaStore(state => state.sequences.find((seq) => seq.programNumber === currentSequenceNumber))
-  //   if(!currentSequence) {
-  //     console.log('No current sequence to save')
-  //     return
-  //   }
-  //   const data = convert8to7bit(currentSequence.toBytes())
-  //   const message = [_channelHex()].concat(hexToBytes(currentSequenceSendRequest), data)
-  //   console.log('saving current sequence ', bytesToHex(message))
-  //   sendSysexMessage(message)
-  // }
-
-  const saveSequenceNumber = (number: number) => {
-    //Get it from the store!!!
-    const sequence: SequenceInfo | null = getSequence(number)
+  const saveToSequenceNumber = (number: number) => {
+    const currentSequenceNumber = getCurrentSequenceNumber()
+    if (!currentSequenceNumber) {
+      throwError(`Select a sequence nnumber!!`)
+      return
+    }
+    const sequence: SequenceInfo | null = getSequence(Number(currentSequenceNumber))
     if (!sequence) {
       throwError(`No sequence loaded for ${number} to save`)
       return
@@ -197,7 +188,7 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     currentChannel,
     setCurrentChannel,
     loadSequenceNumber,
-    saveSequenceNumber,
+    saveToSequenceNumber,
     loadCurrentSequence,
     webMidiContext: injectedMidiContext,
   }
