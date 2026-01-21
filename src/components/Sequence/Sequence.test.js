@@ -50,11 +50,11 @@ describe('Sequence Component', () => {
       webMidiContext: { midiInitialised: true }
     }
     const storeState = {
-      currentSequenceNumber: 9,
+      currentSequenceNumber: 0,
       sequences: [sequence],
     }
     renderWithContext({ contextValue, storeState })
-    expect(screen.getByText('Current Sequence 9')).toBeInTheDocument()
+    expect(screen.getByText('Current Sequence 1')).toBeInTheDocument()
     expect(screen.getAllByRole('listitem')).toHaveLength(16)
   })
 
@@ -64,7 +64,7 @@ describe('Sequence Component', () => {
       webMidiContext: { midiInitialised: true }
     }
     const storeState = {
-      currentSequenceNumber: 9,
+      currentSequenceNumber: 0,
       sequences: [sequence],
     }
     renderWithContext({ contextValue, storeState })

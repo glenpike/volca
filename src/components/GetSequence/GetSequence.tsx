@@ -22,7 +22,7 @@ const GetSequence = () => {
   const [_sequenceNumber] = useState(currentSequenceNumber)
 
   const [sequenceInput, setSequenceInput] = useState(
-    String(currentSequenceNumber ?? 1)
+    String(Math.min(16, Math.max(1, currentSequenceNumber)))
   )
 
   const handleSequenceNumberChange = (event: ChangeEvent<HTMLInputElement>) => {

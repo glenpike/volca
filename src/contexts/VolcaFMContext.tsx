@@ -45,7 +45,6 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     sendUniversalMessage,
   } = injectedMidiContext;
 
-  const setCurrentSequenceNumber = useVolcaStore(state => state.setCurrentSequenceNumber);
   const getCurrentSequenceNumber = useVolcaStore(state => state.getCurrentSequenceNumber)
   const addOrUpdateSequence = useVolcaStore(state => state.addOrUpdateSequence);
   const getSequence = useVolcaStore(state => state.getSequence)
@@ -88,24 +87,17 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
   }
 
   const loadSequenceNumber = (number: number) => {
-    setCurrentSequenceNumber(-1)
     const seqNumber = Number(number - 1).toString(16)
     const request = hexToBytes(seqDumpRequest.replace('%{sequenceNumber}', seqNumber))
     sendSysexMessage([_channelHex()].concat(request))
   }
 
   const loadCurrentSequence = () => {
-    setCurrentSequenceNumber(-1)
     sendSysexMessage([_channelHex()].concat(hexToBytes(currentSeqDumpRequest)))
   }
 
   const saveToSequenceNumber = (number: number) => {
-    const currentSequenceNumber = getCurrentSequenceNumber()
-    if (!currentSequenceNumber) {
-      throwError(`Select a sequence nnumber!!`)
-      return
-    }
-    const sequence: SequenceInfo | null = getSequence(Number(currentSequenceNumber))
+    const sequence: SequenceInfo | null = getSequence(Number(getCurrentSequenceNumber()))
     if (!sequence) {
       throwError(`No sequence loaded for ${number} to save`)
       return
@@ -171,16 +163,18 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
   const parseNumberedSequence = (sequenceBytes: number[]) => {
     const sequenceNumber = sequenceBytes.shift()
     console.log('parseNumberedSequence ', sequenceNumber)
+    if (sequenceNumber == undefined) {
+      throwError(`parseNumberedSequence Error Sequence Number is undefined`)
+      return
+    }
     const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
 
-    addOrUpdateSequence(sequence)
-    setCurrentSequenceNumber(sequence.programNumber)
+    addOrUpdateSequence(sequence, sequenceNumber)
   }
 
   const parseCurrentSequence = (sequenceBytes: number[]) => {
     const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
     addOrUpdateSequence(sequence)
-    setCurrentSequenceNumber(sequence.programNumber)
   }
 
   const volcaFMContextValue = {
