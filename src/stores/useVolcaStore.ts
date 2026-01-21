@@ -1,49 +1,50 @@
 import { create, type ExtractState } from 'zustand';
-import { SequenceInfo, NoteInfo, StepInfo, VolcaState } from '../types';
+import { NoteInfo, StepInfo, VolcaState } from '../types';
 
+
+export const CURRENT_VOLCA_SEQUENCE_INDEX = 16
 
 export const useVolcaStore = create<VolcaState>((set, get) => ({
-  currentSequenceNumber: null,
+  currentSequenceNumber: -1,
   sequences: [],
   setCurrentSequenceNumber: (number: number) => set({ currentSequenceNumber: number }),
   getCurrentSequenceNumber: () => get().currentSequenceNumber,
   getSequence: (number: number) => {
     const state = get()
-    const sequence = state.sequences.find((seq: SequenceInfo) => seq.programNumber === number);
+    const sequence = state.sequences[number];
     if (sequence) {
       return sequence;
     }
     return null;
   },
   clearSequences: () => set({ sequences: [] }),
-  addOrUpdateSequence: (sequence: SequenceInfo) => set((state: any) => {
-    const existingSequenceIndex = state.sequences.findIndex((seq: SequenceInfo) => seq.programNumber === sequence.programNumber);
-    if (existingSequenceIndex !== -1) {
-      // Overwrite the existing sequence
-      const updatedSequences = [...state.sequences];
-      updatedSequences[existingSequenceIndex] = sequence;
-      return { sequences: updatedSequences };
-    } else {
-      // Add the new sequence
-      return { sequences: [...state.sequences, sequence] };
-    }
+  addOrUpdateSequence: (sequence, id) => set((state: any) => {
+    const updatedSequences = [...state.sequences];
+    const sequenceIndex = id === undefined ? CURRENT_VOLCA_SEQUENCE_INDEX : id
+    updatedSequences[sequenceIndex] = sequence;
+    console.log('setting current sequence number to ', sequenceIndex)
+    return { currentSequenceNumber: sequenceIndex, sequences: updatedSequences };
   }),
-  // updateStep: (sequenceId, stepId, updatedData) => set((state) => {
-  //   const sequence = state.sequences.find((seq) => seq.id === sequenceId);
-  //   if (sequence) {
-  //     const stepIndex = sequence.steps.findIndex((step) => step.id === stepId);
-  //     if (stepIndex !== -1) {
-  //       sequence.steps[stepIndex] = {
-  //         ...sequence.steps[stepIndex],
-  //         ...updatedData,
-  //       };
-  //     }
-  //   }
-  //   return { sequences: [...state.sequences] };
-  // }),
+  updateStep: (sequenceId: number, stepId: number, updatedData: Partial<StepInfo>) => set((state: any) => {
+    console.log('updateStep ', sequenceId)
+    const sequence = state.sequences[sequenceId];
+    if (sequence) {
+      console.log('updateStep sequence', stepId)
+      const stepIndex = sequence.steps.findIndex((step: StepInfo) => step.id === stepId);
+      console.log('updateStep stepIndex', stepIndex)
+      if (stepIndex !== -1) {
+        console.log('updateStep step', updatedData)
+        sequence.steps[stepIndex] = {
+          ...sequence.steps[stepIndex],
+          ...updatedData,
+        };
+      }
+    }
+    return { sequences: [...state.sequences] };
+  }),
   updateNote: (sequenceId: number, stepId: number, noteId: number, updatedData: Partial<NoteInfo>) => set((state: any) => {
     console.log('updateNote ', sequenceId)
-    const sequence = state.sequences.find((seq: SequenceInfo) => seq.programNumber === sequenceId);
+    const sequence = state.sequences[sequenceId];
     if (sequence) {
       console.log('updateNote sequence', stepId, noteId)
       const step = sequence.steps.find((step: StepInfo) => step.id === stepId);

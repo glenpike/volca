@@ -14,8 +14,7 @@ interface NoteProps {
 
 const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
   const note: NoteInfo | undefined = useVolcaStore((state) =>
-    state.sequences
-      .find((seq: SequenceInfo) => seq.programNumber === sequenceId)
+    state.sequences[sequenceId]
       ?.steps.find((step: StepInfo) => step.id === stepId)
       ?.notes.find((note: NoteInfo) => note.id === noteId)
   )
@@ -72,6 +71,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
           type="checkbox"
           checked={note.trigger}
           onChange={handleTriggerChange}
+          disabled={!on}
         />
       </label>
       <select

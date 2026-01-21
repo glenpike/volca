@@ -6,7 +6,7 @@ import VolcaFMContext from '../../contexts/VolcaFMContext'
 
 const SequenceDebug = () => {
 	const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
-	const currentSequence = useVolcaStore(state => state.sequences.find((seq: SequenceInfo) => seq.programNumber === currentSequenceNumber))
+	const currentSequence = useVolcaStore(state => state.sequences[currentSequenceNumber])
 
 	const {
 		webMidiContext,

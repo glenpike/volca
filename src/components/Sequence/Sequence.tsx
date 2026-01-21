@@ -1,17 +1,18 @@
 import React, { useContext } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
-import { useVolcaStore } from '../../stores/useVolcaStore'
+import { useVolcaStore, CURRENT_VOLCA_SEQUENCE_INDEX } from '../../stores/useVolcaStore'
 import Step from '../Step/Step'
 import './Sequence.css';
-import { SequenceInfo, StepInfo } from '../../types'
+import { StepInfo } from '../../types'
 
 const Sequence = () => {
   const {
     webMidiContext
   } = useContext(VolcaFMContext)
 
+  console.log('sequence...')
   const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
-  const currentSequence = useVolcaStore(state => state.sequences.find((seq: SequenceInfo) => seq.programNumber === currentSequenceNumber))
+  const currentSequence = useVolcaStore(state => state.sequences[currentSequenceNumber])
 
   const {
     midiInitialised,
@@ -27,13 +28,20 @@ const Sequence = () => {
     )
   }
 
-  const steps = currentSequence.steps.map((step: StepInfo, index: number) =>
-    <li className="sequence-step" key={index}><Step step={step} sequenceId={currentSequence.programNumber} /></li>
+  const steps = currentSequence.steps.map((_step: StepInfo, index: number) =>
+    <li className="sequence-step" key={index}><Step stepId={index} sequenceId={currentSequenceNumber} /></li>
   )
+
+  const heading = () => {
+
+  }
 
   return (
     <div className='sequence'>
-      <h2>Current Sequence {currentSequenceNumber}</h2>
+      {currentSequenceNumber === CURRENT_VOLCA_SEQUENCE_INDEX ?
+        <h2>Current Sequence</h2> :
+        <h2>Sequence {currentSequenceNumber + 1}</h2>
+      }
       <p>Programme Number: {currentSequence.programNumber}</p>
       <ul className="sequence-steps">
         {steps}
