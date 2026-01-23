@@ -1,9 +1,8 @@
 import { SequenceInfo, NoteInfo, StepInfo } from "./volca";
 
-export interface VolcaState {
+export type VolcaState = {
   currentSequenceNumber: number
   sequences: SequenceInfo[]
-  setCurrentSequenceNumber: (number: number) => void
   getCurrentSequenceNumber: () => number | null
   getSequence: (number: number) => SequenceInfo | null
   clearSequences: () => void
