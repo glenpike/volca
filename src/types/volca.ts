@@ -138,17 +138,6 @@ export interface SequenceInfo {
   reserved: SequenceReserved; // Reserved/unused bytes
 }
 
-// Store state interface
-export interface VolcaStoreState {
-  currentSequenceNumber: number | null;
-  sequences: SequenceInfo[];
-  setCurrentSequenceNumber: (number: number) => void;
-  getSequence: (number: number) => SequenceInfo | null;
-  clearSequences: () => void;
-  addOrUpdateSequence: (sequence: SequenceInfo) => void;
-  updateNote: (sequenceId: number, stepId: number, noteId: number, updatedData: Partial<NoteInfo>) => void;
-}
-
 // Utility types for parsing functions
 export interface ParsedStepData {
   notes: NoteInfo[];
