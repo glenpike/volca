@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import Note from './Note'
 import { noteNumberToOctave, noteNumberToName } from '../../utils/MidiNotes'
 import { mockUseVolcaStore } from '../../../test/mockUseVolcaStore'
+jest.unmock('zustand')
 
 const updateNote = jest.fn()
 const noteNumber = 60

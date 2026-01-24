@@ -1,20 +1,9 @@
 
 import { create } from 'zustand'
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react'
 import { VolcaStoreCreator } from './VolcaStoreCreator'
-import { unpackedData } from '../../test/sequenceBytes'
-import { parseSequenceBytes } from '../utils/Volca/parseSequence'
+import { addSequenceToStore } from '../../test/storeHelpers'
 
-const addSequence = async (store, number) => {
-  const sequence = parseSequenceBytes([...unpackedData])
-
-  return new Promise((resolve) => {
-    act(() => {
-      store.addOrUpdateSequence(sequence, number)
-    })
-    resolve(sequence)
-  })
-}
 describe('VolcaStore', () => {
   test('currentSequenceNumber default', () => {
     const useStore = create(VolcaStoreCreator)
@@ -32,7 +21,7 @@ describe('VolcaStore', () => {
     const useStore = create(VolcaStoreCreator)
     const { result } = renderHook(() => useStore())
 
-    const sequence = await addSequence(result.current, 0)
+    const sequence = await addSequenceToStore(result.current, 0)
     expect(result.current.sequences).toEqual([sequence])
     expect(result.current.currentSequenceNumber).toBe(0)
   })
@@ -41,7 +30,7 @@ describe('VolcaStore', () => {
     const useStore = create(VolcaStoreCreator)
     const { result } = renderHook(() => useStore())
 
-    const sequence = await addSequence(result.current)
+    await addSequenceToStore(result.current)
 
     expect(result.current.currentSequenceNumber).toBe(16)
   })
@@ -50,7 +39,7 @@ describe('VolcaStore', () => {
     const useStore = create(VolcaStoreCreator)
     const { result } = renderHook(() => useStore())
 
-    await addSequence(result.current)
+    await addSequenceToStore(result.current)
 
     act(() => {
       result.current.clearSequences()
@@ -63,7 +52,7 @@ describe('VolcaStore', () => {
     const useStore = create(VolcaStoreCreator)
     const { result } = renderHook(() => useStore())
 
-    const sequence = await addSequence(result.current, 0)
+    const sequence = await addSequenceToStore(result.current, 0)
     let currentSequence
     act(() => {
       currentSequence = result.current.getSequence(0)
@@ -75,7 +64,7 @@ describe('VolcaStore', () => {
     const useStore = create(VolcaStoreCreator)
     const { result } = renderHook(() => useStore())
 
-    const sequence = await addSequence(result.current, 0)
+    await addSequenceToStore(result.current, 0)
 
     const step = result.current.sequences[0].steps[0]
 
@@ -96,7 +85,8 @@ describe('VolcaStore', () => {
     const useStore = create(VolcaStoreCreator)
     const { result } = renderHook(() => useStore())
 
-    const sequence = await addSequence(result.current, 0)
+    await addSequenceToStore(result.current, 0)
+
     const note = result.current.sequences[0].steps[0].notes[0]
     expect(note.note).toEqual([54, 0])
     expect(note.velocity).toBe(64)

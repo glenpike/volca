@@ -10,7 +10,6 @@ const Sequence = () => {
     webMidiContext
   } = useContext(VolcaFMContext)
 
-  console.log('sequence...')
   const currentSequenceNumber = useVolcaStore((state) => state.currentSequenceNumber);
   const currentSequence = useVolcaStore(state => state.sequences[currentSequenceNumber])
 
