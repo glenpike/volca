@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Step from './Step';
 import { mockUseVolcaStore } from '../../../test/mockUseVolcaStore'
+jest.unmock('zustand')
 
 const updateStep = jest.fn()
 

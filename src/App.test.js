@@ -1,5 +1,6 @@
 import { render, screen, act, } from '@testing-library/react';
 import { mockUseVolcaStore } from '../test/mockUseVolcaStore'
+jest.unmock('zustand')
 
 import App from './App';
 

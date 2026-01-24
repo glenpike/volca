@@ -7,6 +7,7 @@ import VolcaFMContext from '../../contexts/VolcaFMContext'
 import { unpackedData } from '../../../test/sequenceBytes'
 import { parseSequenceBytes } from '../../utils/Volca/parseSequence'
 import { mockUseVolcaStore } from '../../../test/mockUseVolcaStore'
+jest.unmock('zustand')
 
 jest.mock('../Step/Step', () => () => <div className="step">Mock Step</div>);
 
@@ -54,7 +55,7 @@ describe('Sequence Component', () => {
       sequences: [sequence],
     }
     renderWithContext({ contextValue, storeState })
-    expect(screen.getByText('Current Sequence 1')).toBeInTheDocument()
+    expect(screen.getByText('Sequence 1')).toBeInTheDocument()
     expect(screen.getAllByRole('listitem')).toHaveLength(16)
   })
 

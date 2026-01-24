@@ -12,7 +12,6 @@ const createUncurried = <T>(
   stateCreator: ZustandExportedTypes.StateCreator<T>,
 ) => {
   const store = actualCreate(stateCreator)
-  console.log('store ', store);
   const initialState = store.getInitialState()
   storeResetFns.add(() => {
     store.setState(initialState, true)
@@ -24,8 +23,6 @@ const createUncurried = <T>(
 export const create = (<T>(
   stateCreator: ZustandExportedTypes.StateCreator<T>,
 ) => {
-  console.log('zustand create mock ', typeof stateCreator)
-
   // to support curried version of create
   return typeof stateCreator === 'function'
     ? createUncurried(stateCreator)
@@ -47,14 +44,23 @@ const createStoreUncurried = <T>(
 export const createStore = (<T>(
   stateCreator: ZustandExportedTypes.StateCreator<T>,
 ) => {
-  console.log('zustand createStore mock')
-
   // to support curried version of createStore
   return typeof stateCreator === 'function'
     ? createStoreUncurried(stateCreator)
     : createStoreUncurried
 }) as typeof ZustandExportedTypes.createStore
 
+
+/**
+ * FIXME:
+ * This doesn't play nice with our mockUseVolcaStore because
+ * it calls afterEach in the 'render' loop, so we have to
+ * specifically unmock zustand in each component test that
+ * uses it.
+ *
+ * See if we can configure Jest not to 'automock' and
+ * specifically mock zustand in our store tests?
+ */
 // reset all stores after each test run
 afterEach(() => {
   act(() => {

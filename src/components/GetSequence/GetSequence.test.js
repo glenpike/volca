@@ -4,7 +4,7 @@ import { userEvent } from '@testing-library/user-event'
 import GetSequence from "./GetSequence"
 import VolcaFMContext from '../../contexts/VolcaFMContext'
 import { mockUseVolcaStore } from '../../../test/mockUseVolcaStore'
-
+jest.unmock('zustand')
 
 const webMidiContext = {
   midiInitialised: false,

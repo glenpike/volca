@@ -2,7 +2,7 @@ import React from 'react'
 import { useVolcaStore } from '../../stores/useVolcaStore'
 import { noteNumberToName, noteNumberToOctave, musicalNotes, noteToMidi } from '../../utils/MidiNotes'
 import './Note.css'
-import { SequenceInfo, StepInfo, NoteInfo } from '../../types/volca'
+import { StepInfo, NoteInfo } from '../../types/volca'
 
 interface NoteProps {
   noteId: number;
