@@ -67,7 +67,7 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
-  "homepage": "https://volca-fm2-pattern-editor.netlify.app",
+  "homepage": ".",
   "browserslist": {
     "production": [
       ">0.2%",
