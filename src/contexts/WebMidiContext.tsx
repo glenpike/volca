@@ -114,7 +114,7 @@ const WebMidiContextProvider = ({ children, manufacturer, WebMidi }: WebMidiCont
 				console.log(`rx sysex: ${bytesToHex(message)}`)
 				const firstByte = message.shift()
 				const lastByte = message.pop()
-				if (firstByte != 0xf0 && lastByte != 0xf2) {
+				if (firstByte !== 0xf0 && lastByte !== 0xf2) {
 					console.log('is not a valid Sysex message ', firstByte, lastByte)
 					return
 				}

@@ -29,7 +29,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
   const { trigger, note: [noteNumber, otherNoteValue], velocity, gateTimeInt } = note
   const disabled = !(on && trigger)
   const noteOptions = [...musicalNotes]
-  const tiedNote = gateTimeInt == 127
+  const tiedNote = gateTimeInt === 127
 
   const handleTriggerChange = (event: any) => {
     const trigger = !!event.target.checked

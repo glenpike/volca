@@ -1,4 +1,4 @@
-import { MOTION_PARAM_NAMES, NoteInfo, ByteArray, StepInfo, ParsedStepInfo, MotionData } from '../../types';
+import { MOTION_PARAM_NAMES, NoteInfo, ByteArray, ParsedStepInfo, MotionData } from '../../types';
 
 export const GATE_TIME_LOOKUP = [
   "0", "1", "3", "4", "6", "7", "8", "10",
@@ -77,7 +77,7 @@ export const packStepData = (data: ParsedStepInfo) => {
     bytes[i * 2] = notes[i].note[0] & 0xFF
     bytes[(i * 2) + 1] = notes[i].note[1] & 0xFF
     bytes[i + 18] = notes[i].velocity
-    bytes[24 + i] = ((notes[i].trigger ? 1 : 0) << 7) | notes[i].gateTimeInt & 0x7F
+    bytes[24 + i] = ((notes[i].trigger ? 1 : 0) << 7) | (notes[i].gateTimeInt & 0x7F)
   }
   // Reserved (Bytes 30-31): Typically not used
   for (let i = 0; i < 12; i++) {

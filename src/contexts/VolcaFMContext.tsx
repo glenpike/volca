@@ -1,10 +1,10 @@
-import React, { useState, useEffect, createContext } from 'react'
+import React, { useState, useEffect, useCallback, createContext } from 'react'
 import { bytesToHex, hexToBytes } from '../utils/utils'
 import { convert7to8bit, convert8to7bit } from "../utils/MidiUtils"
 import { parseSequenceBytes, packSequenceData } from '../utils/Volca/parseSequence'
 import { useVolcaStore } from '../stores/useVolcaStore'
 
-import { VolcaFMContextType, MidiContextType, ByteArray } from '../types'
+import { VolcaFMContextType, MidiContextType } from '../types'
 import VolcaFMContextError from '../errors/VolcaFMContextError'
 import { SequenceInfo } from '../types'
 
@@ -28,9 +28,9 @@ const VolcaFMContext = createContext<VolcaFMContextType>(
   }
 )
 
-const UNKNOWN_MESSAGE = 'unknown-message'
-const SEQUENCE_DUMP = 'sequence-dump'
-const CURRENT_SEQUENCE_DUMP = 'current-sequence-dump'
+// const UNKNOWN_MESSAGE = 'unknown-message'
+// const SEQUENCE_DUMP = 'sequence-dump'
+// const CURRENT_SEQUENCE_DUMP = 'current-sequence-dump'
 
 interface VolcaFMContextProviderProps {
   children: React.ReactNode;
@@ -68,20 +68,6 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     throw new VolcaFMContextError(message)
   }
 
-  useEffect(() => {
-    if (lastRxSysexMessage && lastRxSysexMessage.length > 1) {
-      const [firstByte, ...sysexMessage]: Array<number> = Array.from(lastRxSysexMessage)
-      if (firstByte == 0x42) {
-        console.log('Korg message for us ', sysexMessage)
-        parseKorgMessage(sysexMessage)
-      } else if (firstByte == 0x7e) {
-        parseUniversalMessage(sysexMessage)
-      } else {
-        throwError(`Unknown message for us ${bytesToHex(sysexMessage)}`)
-      }
-    }
-  }, [lastRxSysexMessage])
-
   const _channelHex = () => {
     return 0x30 | currentChannel
   }
@@ -111,10 +97,27 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
     sendSysexMessage(message)
   }
 
-  const parseUniversalMessage = (sysexMessage: number[]) => {
+  const parseNumberedSequence = useCallback((sequenceBytes: number[]) => {
+    const sequenceNumber = sequenceBytes.shift()
+    console.log('parseNumberedSequence ', sequenceNumber)
+    if (sequenceNumber === undefined) {
+      throwError(`parseNumberedSequence Error Sequence Number is undefined`)
+      return
+    }
+    const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
+
+    addOrUpdateSequence(sequence, sequenceNumber)
+  }, [addOrUpdateSequence])
+
+  const parseCurrentSequence = useCallback((sequenceBytes: number[]) => {
+    const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
+    addOrUpdateSequence(sequence)
+  }, [addOrUpdateSequence])
+
+  const parseUniversalMessage = useCallback((sysexMessage: number[]) => {
     const [channelByte, ...message]: Array<number> = sysexMessage
     const channel = channelByte & 0x0f
-    if (channelByte == undefined || channel != currentChannel) {
+    if (channelByte === undefined || channel !== currentChannel) {
       throwError(`parseUniversalMessage Error Channel ${channelByte} is not for us ${currentChannel}`)
     }
 
@@ -126,12 +129,12 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
       default:
         console.log('Cannot handle message ', byteStr)
     }
-  }
+  }, [currentChannel])
 
-  const parseKorgMessage = (sysexMessage: number[]) => {
+  const parseKorgMessage = useCallback((sysexMessage: number[]) => {
     const [channelByte, ...message]: Array<number> = sysexMessage
     const channel = channelByte & 0x0f
-    if (channelByte == undefined || channel != currentChannel) {
+    if (channelByte === undefined || channel !== currentChannel) {
       throwError(`Parse Error Channel ${channelByte} is not for us ${currentChannel}`)
     }
 
@@ -158,24 +161,22 @@ const VolcaFMContextProvider = ({ children, channel, injectedMidiContext }: Volc
       default:
         throwError(`Cannot handle Korg Message type: ${byteStr}`)
     }
-  }
+  }, [currentChannel, parseCurrentSequence, parseNumberedSequence])
 
-  const parseNumberedSequence = (sequenceBytes: number[]) => {
-    const sequenceNumber = sequenceBytes.shift()
-    console.log('parseNumberedSequence ', sequenceNumber)
-    if (sequenceNumber == undefined) {
-      throwError(`parseNumberedSequence Error Sequence Number is undefined`)
-      return
+  useEffect(() => {
+    if (lastRxSysexMessage && lastRxSysexMessage.length > 1) {
+      const [firstByte, ...sysexMessage]: Array<number> = Array.from(lastRxSysexMessage)
+      if (firstByte === 0x42) {
+        console.log('Korg message for us ', sysexMessage)
+        parseKorgMessage(sysexMessage)
+      } else if (firstByte === 0x7e) {
+        parseUniversalMessage(sysexMessage)
+      } else {
+        throwError(`Unknown message for us ${bytesToHex(sysexMessage)}`)
+      }
     }
-    const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
+  }, [lastRxSysexMessage, parseKorgMessage, parseUniversalMessage])
 
-    addOrUpdateSequence(sequence, sequenceNumber)
-  }
-
-  const parseCurrentSequence = (sequenceBytes: number[]) => {
-    const sequence = parseSequenceBytes(new Uint8Array(convert7to8bit(sequenceBytes)))
-    addOrUpdateSequence(sequence)
-  }
 
   const volcaFMContextValue = {
     deviceInquiry,

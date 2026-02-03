@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { bytesToHex } from '../../utils/utils'
 import { useVolcaStore } from '../../stores/useVolcaStore'
-import { MidiContextType, SequenceInfo } from '../../types'
+import { MidiContextType } from '../../types'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
 
 const SequenceDebug = () => {

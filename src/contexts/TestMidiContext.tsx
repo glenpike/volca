@@ -33,8 +33,8 @@ const TestMidiContextProvider = ({ children, manufacturer }: TestMidiContextProv
   const [currentManufacturer, setManufacturer] = useState<number>(manufacturer || 0x42)
   const [currentOutput, _setCurrentOutput] = useState<null>(null)
   const [currentInput, _setCurrentInput] = useState<null>(null)
-  const [midiOutputs, setMidiOutputs] = useState<[]>([])
-  const [midiInputs, setMidiInputs] = useState<[]>([])
+  const [midiOutputs] = useState<[]>([])
+  const [midiInputs] = useState<[]>([])
   const [lastTxSysexMessage, setTxSysexMessage] = useState<SentSysexMessage | null>(null)
   const [lastRxSysexMessage, setLastRxSysexMessage] = useState<Uint8Array | null>(null)
   const [midiInitialised, setMidiInitialised] = useState(false)
@@ -64,7 +64,7 @@ const TestMidiContextProvider = ({ children, manufacturer }: TestMidiContextProv
       const message: Array<number> = [...testSysexMessage]
       const firstByte = message.shift()
       const lastByte = message.pop()
-      if (firstByte != 0xf0 && lastByte != 0xf2) {
+      if (firstByte !== 0xf0 && lastByte !== 0xf2) {
         console.log('is not a valid Sysex message ', testSysexMessage)
         return
       }

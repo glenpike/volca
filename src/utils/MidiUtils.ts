@@ -20,7 +20,7 @@ const convert7to8bit = (inputData: number[]) => {
   let highBits = 0;
   for (let i = 0; i < inputData.length; i++) {
     const pos = i % 8; // relative position in this group of 8 bytes
-    if (pos == 0) { // first byte
+    if (pos === 0) { // first byte
       highBits = inputData[i];
     } else {
       let highBit = highBits & (1 << (pos - 1));
@@ -38,17 +38,17 @@ const convert8to7bit = (inputData: number[]) => {
   let nextHighBytePos = 0
 
   for (let i = 0; i < inputData.length; i++) {
-    if (i % 7 == 0) {
+    if (i % 7 === 0) {
       nextHighBytePos = output
       highByte = 0
       output++
     }
     let byte = inputData[i]
-    highByte = highByte | (byte & 0x80) >> (7 - (i % 7))
+    highByte = highByte | ((byte & 0x80) >> (7 - (i % 7)))
     convertedData[output] = byte & 0x7F;
     output++
 
-    if (i % 7 == 6 || i + 1 == inputData.length) {
+    if (i % 7 === 6 || i + 1 === inputData.length) {
       convertedData[nextHighBytePos] = highByte
     }
   }

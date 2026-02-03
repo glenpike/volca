@@ -19,8 +19,6 @@ const GetSequence = () => {
     midiInitialised,
   } = webMidiContext as MidiContextType
 
-  const [_sequenceNumber] = useState(currentSequenceNumber)
-
   const [sequenceInput, setSequenceInput] = useState(
     String(Math.min(16, Math.max(1, currentSequenceNumber)))
   )

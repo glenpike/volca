@@ -32,7 +32,7 @@ const MidiSelect = () => {
     if (!midiInitialised) {
       initialise()
     }
-  }, [midiInitialised])
+  }, [midiInitialised, initialise])
 
   const handleOutputChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const index = Number(event.target.value)

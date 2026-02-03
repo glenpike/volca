@@ -31,10 +31,6 @@ const Sequence = () => {
     <li className="sequence-step" key={index}><Step stepId={index} sequenceId={currentSequenceNumber} /></li>
   )
 
-  const heading = () => {
-
-  }
-
   return (
     <div className='sequence'>
       {currentSequenceNumber === CURRENT_VOLCA_SEQUENCE_INDEX ?
