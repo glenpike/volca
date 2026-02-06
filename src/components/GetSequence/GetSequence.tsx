@@ -2,6 +2,7 @@ import React, { useContext, useState, ChangeEvent } from 'react'
 import VolcaFMContext from '../../contexts/VolcaFMContext'
 import { useVolcaStore } from '../../stores/useVolcaStore'
 import { MidiContextType } from '../../types'
+import { Button } from '../common/Button/Button'
 
 const GetSequence = () => {
   const {
@@ -51,12 +52,27 @@ const GetSequence = () => {
         <div className="flex-row">
           <label htmlFor="sequence-select">Sequence Number</label>{' '}
           <input type="number" id="sequence-select" min="1" max="16" value={sequenceInput} onChange={handleSequenceNumberChange} />
-          <button className="button button--primary" onClick={handleGetSequenceNumber}>Load</button>
-          <button className="button button--primary" onClick={handleSaveSequenceNumber}>Save current to...</button>
+          <Button
+            label="Load"
+            onClick={handleGetSequenceNumber}
+            primary
+          />
+          <Button
+            label="Save current to..."
+            onClick={handleSaveSequenceNumber}
+            primary
+          />
         </div>
         <div className="flex-row">
-          <button className="button button--primary" onClick={loadCurrentSequence}>Load Current</button>
-          <button className="button button--secondary" onClick={deviceInquiry}>Check Device</button>
+          <Button
+            label="Load Current"
+            onClick={loadCurrentSequence}
+            primary
+          />
+          <Button
+            label="Check Device"
+            onClick={deviceInquiry}
+          />
         </div>
       </div>
     </fieldset>

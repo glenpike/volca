@@ -65,7 +65,9 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "homepage": ".",
   "browserslist": {
@@ -141,6 +143,13 @@
   },
   "devDependencies": {
     "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "storybook": "^10.2.7",
+    "@storybook/react-webpack5": "^10.2.7",
+    "@storybook/addon-webpack5-compiler-swc": "^4.0.2",
+    "@storybook/addon-a11y": "^10.2.7",
+    "@storybook/addon-docs": "^10.2.7",
+    "@storybook/addon-onboarding": "^10.2.7",
+    "eslint-plugin-storybook": "^10.2.7"
   }
 }
