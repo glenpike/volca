@@ -1,6 +1,6 @@
 import { Input, Output } from 'webmidi'
 
-export type SentSysexMessage = {
+export interface SentSysexMessage {
   manufacturer: number;
   data: Uint8Array;
 }
