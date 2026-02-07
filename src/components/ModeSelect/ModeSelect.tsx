@@ -1,5 +1,6 @@
 import './ModeSelect.css'
 import { useMidiMode } from "../../contexts/MidiModeContext";
+import ToggleButton from "../common/ToggleButton/ToggleButton";
 
 const ModeSelect = () => {
   const { mode, setMode } = useMidiMode();
@@ -8,13 +9,14 @@ const ModeSelect = () => {
     setMode(mode === 'real' ? 'test' : 'real');
   }
   return (
-    <>
-      <span className="mode-select-label" id="mode-select">"Test Midi" Mode</span>
-      <button className="mode-select-button" role="switch" aria-checked={mode === 'test'} aria-labelledby="mode-select" onClick={handleModeChange}>
-        <span>on</span>
-        <span>off</span>
-      </button>
-    </>
+    <ToggleButton
+      label="Midi Mode"
+      onLabel="Test"
+      offLabel="Live"
+      checked={mode === 'test'}
+      onClick={handleModeChange}
+      primary={true}
+    />
   )
 }
 

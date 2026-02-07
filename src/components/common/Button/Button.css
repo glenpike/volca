@@ -1,12 +1,12 @@
 .button {
   display: inline-block;
   cursor: pointer;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
   border-radius: 5px;
+  padding: 0.5rem 1rem;
+  font-family: var(--primary-font-family);
+  font-size: 1rem;
   font-weight: 700;
   line-height: 1;
-  font-weight: 700;
 }
 
 .button--primary {

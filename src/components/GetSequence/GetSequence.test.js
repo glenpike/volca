@@ -53,10 +53,10 @@ describe('GetSequence', () => {
         renderWithContext()
       })
       expect(screen.getByLabelText('Sequence Number')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Load' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Load Current' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Save current to...' })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Check Device' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'LOAD' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'LOAD CURRENT' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'SAVE CURRENT TO...' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'CHECK DEVICE' })).toBeInTheDocument()
     })
 
 
@@ -70,7 +70,7 @@ describe('GetSequence', () => {
       })
 
       const number = screen.getByLabelText('Sequence Number')
-      const load = screen.getByRole('button', { name: 'Load' })
+      const load = screen.getByRole('button', { name: 'LOAD' })
       await user.clear(number)
       await user.type(number, '15')
       await user.click(load)
@@ -86,7 +86,7 @@ describe('GetSequence', () => {
         renderWithContext()
       })
 
-      const load = screen.getByRole('button', { name: 'Load Current' })
+      const load = screen.getByRole('button', { name: 'LOAD CURRENT' })
       await user.click(load)
 
       expect(loadCurrentSequence).toHaveBeenCalled()

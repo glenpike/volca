@@ -35,7 +35,7 @@ describe('App', () => {
     await act(async () => {
       render(<App />);
     });
-    const toggle = screen.getByRole('switch', { name: /"Test Midi" Mode/i });
+    const toggle = screen.getByRole('switch', { name: /Midi Mode/i });
     expect(toggle).toBeInTheDocument();
     expect(toggle).toHaveAttribute('aria-checked', 'true');
   });

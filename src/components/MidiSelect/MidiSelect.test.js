@@ -26,13 +26,6 @@ const mebWidi = {
 }
 
 describe('MidiSelect ', () => {
-  // test  ('WebMidiMocking', async () => {
-  //   console.log('mebWidi.enable ', mebWidi.enable)
-  //   const value = await mebWidi.enable({ foo: 'bar' })
-  //   console.log('value ', value)
-  //   console.log('getInputById 1 ', mebWidi.getInputById('1'))
-  // })
-
   test('Renders the Midi Input Selector', async () => {
     await act(async () => {
       webmidiRender(<MidiSelect />, { WebMidi: mebWidi })

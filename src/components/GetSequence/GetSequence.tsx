@@ -53,24 +53,24 @@ const GetSequence = () => {
           <label htmlFor="sequence-select">Sequence Number</label>{' '}
           <input type="number" id="sequence-select" min="1" max="16" value={sequenceInput} onChange={handleSequenceNumberChange} />
           <Button
-            label="Load"
+            label="LOAD"
             onClick={handleGetSequenceNumber}
             primary
           />
           <Button
-            label="Save current to..."
+            label="SAVE CURRENT TO..."
             onClick={handleSaveSequenceNumber}
             primary
           />
         </div>
         <div className="flex-row">
           <Button
-            label="Load Current"
+            label="LOAD CURRENT"
             onClick={loadCurrentSequence}
             primary
           />
           <Button
-            label="Check Device"
+            label="CHECK DEVICE"
             onClick={deviceInquiry}
           />
         </div>
