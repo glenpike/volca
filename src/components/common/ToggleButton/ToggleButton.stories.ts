@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-webpack5';
 
-import { fn } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
 
 import { ToggleButton } from './ToggleButton';
 
@@ -25,6 +25,11 @@ export const Primary: Story = {
     primary: true,
     label: 'volca fm',
   },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByRole('switch', { name: /volca fm/i });
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalled();
+  }
 };
 
 export const Secondary: Story = {
@@ -55,3 +60,16 @@ export const LightBackground: Story = {
     lightBackground: true,
   }
 };
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+    label: "Disabled ToggleButton",
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByRole('switch', { name: /Disabled ToggleButton/i });
+    await userEvent.click(button);
+    await expect(args.onClick).not.toHaveBeenCalled();
+  }
+};
+

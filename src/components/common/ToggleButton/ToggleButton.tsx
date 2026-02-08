@@ -24,6 +24,8 @@ export interface ToggleButtonProps {
   lightBackground?: boolean;
   /** Optional click handler */
   onClick?: () => void;
+  /** Optional disabled state */
+  disabled?: boolean;
 }
 
 export const ToggleButton = ({
@@ -38,6 +40,7 @@ export const ToggleButton = ({
   checked,
   lightBackground,
   onClick,
+  disabled,
   ...props
 }: ToggleButtonProps) => {
   const mode = primary ? 'toggle-button--primary' : 'toggle-button--secondary';
@@ -62,6 +65,7 @@ export const ToggleButton = ({
         aria-labelledby={id}
         style={{ backgroundColor }}
         onClick={onClick}
+        disabled={disabled}
         {...props}
       >
         <span style={{ color: onSpanColor }}>{onLabel || 'on'}</span>
