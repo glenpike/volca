@@ -13,6 +13,15 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     backgroundColor: { control: 'color' },
+    size: { control: 'radio', options: ['small', 'medium', 'large'] },
+    checked: { control: 'boolean' },
+    lightBackground: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+    ariaLabel: {
+      control: 'text'
+    },
+    onLabel: { control: 'text' },
+    offLabel: { control: 'text' },
   },
   args: { onClick: fn() },
 } satisfies Meta<typeof ToggleButton>;

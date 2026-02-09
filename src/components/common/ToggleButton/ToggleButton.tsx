@@ -4,24 +4,24 @@ import './ToggleButton.css'
 export interface ToggleButtonProps {
   /** Primary or secondary style */
   primary?: boolean;
-  /** How large should the button be? */
-  size?: 'small' | 'medium' | 'large';
-  /** What background color to use (overrides primary/secondary) */
+  /** Background colour override - defaults to primary / secondary colour*/
   backgroundColor?: string;
-  /** What label color to use */
-  labelColor?: string;
-  /** Button contents */
-  label: string;
-  /** Aria label */
-  ariaLabel?: string;
-  /** Label for 'on' state */
-  onLabel?: string;
-  /** Label for 'off' state */
-  offLabel?: string;
-  /** if true is 'on' */
-  checked?: boolean;
   /** set to true if we are on a light background! */
   lightBackground?: boolean;
+  /** Label colour override - defaults to primary / secondary or 'lightBackground' colour*/
+  labelColor?: string;
+  /** The label text next to the button */
+  label: string;
+  /** Aria label - defaults to the label text */
+  ariaLabel?: string;
+  /** Label text for 'on' state - default 'on' */
+  onLabel?: string;
+  /** Label text for 'off' state - default 'off' */
+  offLabel?: string;
+  /** How large should the button be? */
+  size?: 'small' | 'medium' | 'large';
+  /** if true, displays the 'on' state */
+  checked?: boolean;
   /** Optional click handler */
   onClick?: () => void;
   /** Optional disabled state */
@@ -43,17 +43,17 @@ export const ToggleButton = ({
   disabled,
   ...props
 }: ToggleButtonProps) => {
-  const mode = primary ? 'toggle-button--primary' : 'toggle-button--secondary';
+  const primaryOrSecondaryStyle = primary ? 'toggle-button--primary' : 'toggle-button--secondary';
   const labelColorClass = lightBackground ? 'toggle-button--light' : '';
-  const id = ariaLabel || label.toLowerCase().replace(' ', '-') || 'toggle';
+  const arialLabelledBy = ariaLabel || label.toLowerCase().replace(' ', '-') || 'toggle';
   const onSpanColor = checked === true ? backgroundColor : '';
   const offSpanColor = checked === false ? backgroundColor : '';
   return (
-    <div className={['toggle-button-wrapper', `toggle-button--${size}`, mode, labelColorClass].join(' ')}
+    <div className={['toggle-button-wrapper', `toggle-button--${size}`, primaryOrSecondaryStyle, labelColorClass].join(' ')}
     >
       <span
         className="toggle-button-label"
-        id={id}
+        id={arialLabelledBy}
         style={{ color: labelColor }}
       >
         {label}
@@ -62,7 +62,7 @@ export const ToggleButton = ({
         className="toggle-button"
         role="switch"
         aria-checked={checked ? 'true' : 'false'}
-        aria-labelledby={id}
+        aria-labelledby={arialLabelledBy}
         style={{ backgroundColor }}
         onClick={onClick}
         disabled={disabled}
