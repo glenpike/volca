@@ -72,7 +72,7 @@ describe('Note Component', () => {
         expect(screen.getByLabelText('Velocity')).toBeEnabled()
       })
 
-      test('gate time input is enabled when on is true and trigger is true', () => {
+      test('gate time input is enabled when on is true', () => {
         renderNote(noteState)
         expect(screen.getByLabelText('Gate Time')).toBeEnabled()
       })
@@ -83,26 +83,6 @@ describe('Note Component', () => {
       test('checkbox is not checked', () => {
         renderNote(noteState)
         expect(screen.getByLabelText('Trigger Note')).not.toBeChecked()
-      })
-
-      test('select is disabled', () => {
-        renderNote(noteState)
-        expect(screen.getByLabelText('Note')).toBeDisabled()
-      })
-
-      test('octave input is disabled', () => {
-        renderNote(noteState)
-        expect(screen.getByLabelText('Octave')).toBeDisabled()
-      })
-
-      test('velocity input is disabled', () => {
-        renderNote(noteState)
-        expect(screen.getByLabelText('Velocity')).toBeDisabled()
-      })
-
-      test('gate time input is disabled', () => {
-        renderNote(noteState)
-        expect(screen.getByLabelText('Gate Time')).toBeDisabled()
       })
     })
   })
@@ -150,13 +130,6 @@ describe('Note Component', () => {
     const checkbox = screen.getByLabelText('Trigger Note')
     fireEvent.click(checkbox)
     expect(updateNote).toHaveBeenCalledWith(0, 0, 0, { trigger: false })
-  })
-
-  test('tied note change event', () => {
-    renderNote(noteState)
-    const checkbox = screen.getByLabelText('Tied Note')
-    fireEvent.click(checkbox)
-    expect(updateNote).toHaveBeenCalledWith(0, 0, 0, { gateTimeInt: 127 })
   })
 
   test('note value change event', () => {

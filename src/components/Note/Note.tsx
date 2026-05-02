@@ -27,7 +27,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
   }
 
   const { trigger, note: [noteNumber, otherNoteValue], velocity, gateTimeInt } = note
-  const disabled = !(on && trigger)
+  const disabled = !on
   const noteOptions = [...musicalNotes]
   const tiedNote = gateTimeInt === 127
 
@@ -50,12 +50,6 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
     updateNote(sequenceId, stepId, noteId, { velocity: parseInt(event.target.value, 10) })
   }
 
-  const handleTiedNoteChange = (event: any) => {
-    const tiedNote = !!event.target.checked
-    const newGateTime = tiedNote ? 127 : 100
-    updateNote(sequenceId, stepId, noteId, { gateTimeInt: newGateTime })
-  }
-
   const handleGateTimeChange = (event: any) => {
     let newGateTime = parseInt(event.target.value, 10)
     updateNote(sequenceId, stepId, noteId, { gateTimeInt: newGateTime })
@@ -69,7 +63,7 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
           id={`trigger-${idString}`}
           aria-label="Trigger Note"
           type="checkbox"
-          checked={note.trigger}
+          checked={trigger}
           onChange={handleTriggerChange}
           disabled={!on}
         />
@@ -111,19 +105,9 @@ const Note = ({ noteId, sequenceId, stepId, on, motionData }: NoteProps) => {
         max="127"
         value={gateTimeInt}
         onChange={handleGateTimeChange}
-        disabled={disabled || tiedNote}
+        disabled={disabled}
       />
-      <label htmlFor={`tiedNote-${idString}`}>
-        Tied Note?
-        <input
-          id={`tiedNote-${idString}`}
-          aria-label="Tied Note"
-          type="checkbox"
-          checked={tiedNote}
-          onChange={handleTiedNoteChange}
-          disabled={disabled}
-        />
-      </label>
+      {/* <p>Tie next note?: {tiedNote ? 'Yes' : 'No'}</p> */}
       <p className="noteMotionData">Motion Data: {JSON.stringify(motionData)}</p>
     </div>
   )
